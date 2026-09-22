@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AC Circuits: Reactance, Impedance and Resonance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ---------- theme tokens ---------- */
+:root[data-theme="dark"]{
+  --bg:#0d1117; --panel:#161b22; --panel2:#0f141a; --border:#27313d;
+  --text:#d7e2ee; --muted:#8b9cb0; --bright:#ffffff;
+  --svgbg:#0a0e13; --grid:#1b232d; --axis:#3a4756;
+  --cR:#fb923c; --cL:#c084fc; --cC:#22d3ee; --cI:#4ade80; --cV:#fb7185;
+  --accent:#818cf8; --accentBg:#1e2140; --accentTxt:#a5b4fc;
+  --ok:#34d399; --okBg:#0c3a2c; --bad:#f87171; --badBg:#3f1516;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+:root[data-theme="light"]{
+  --bg:#f5f7fa; --panel:#ffffff; --panel2:#eef2f6; --border:#d5dde6;
+  --text:#1f2a37; --muted:#5b6b7c; --bright:#0b1220;
+  --svgbg:#ffffff; --grid:#e8edf3; --axis:#b3c0cf;
+  --cR:#c2410c; --cL:#6d28d9; --cC:#0e7490; --cI:#15803d; --cV:#be123c;
+  --accent:#4338ca; --accentBg:#e6e8fb; --accentTxt:#3730a3;
+  --ok:#15803d; --okBg:#dcfce7; --bad:#b91c1c; --badBg:#fee2e2;
+  --shadow:0 1px 3px rgba(15,23,42,.08);
+}
+
+body{font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);
+     padding:20px 16px 60px;min-height:100vh;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+
+/* ---------- header ---------- */
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.chip{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.07em;padding:3px 9px;border-radius:5px;
+      background:var(--accentBg);color:var(--accentTxt);margin-bottom:7px}
+h1{font-size:23px;font-weight:700;color:var(--bright);line-height:1.2;letter-spacing:-.01em}
+.sub{font-size:13px;color:var(--muted);margin-top:4px;max-width:70ch}
+.themebtn{border:1px solid var(--border);background:var(--panel);color:var(--muted);border-radius:8px;
+          padding:7px 12px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.themebtn:hover{border-color:var(--accent);color:var(--text)}
+
+/* ---------- tabs ---------- */
+nav{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:12px}
+.tab{padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:var(--panel);color:var(--muted);
+     cursor:pointer;font:inherit;font-size:12.5px;font-weight:500;transition:.12s;display:flex;gap:7px;align-items:center}
+.tab:hover{border-color:var(--accent);color:var(--text)}
+.tab.active{border-color:var(--accent);background:var(--accentBg);color:var(--accentTxt);font-weight:700}
+.tab .n{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.65;font-weight:600}
+
+/* ---------- layout ---------- */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:15px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:14px;align-items:start}
+.g-73{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.g-64{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}
+.g-11{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media(max-width:940px){.g-73,.g-64,.g-11{grid-template-columns:1fr}}
+.stack{display:flex;flex-direction:column;gap:14px}
+
+h2.sec{font-size:16px;font-weight:700;color:var(--bright);margin-bottom:5px}
+h3.sub3{font-size:13px;font-weight:700;color:var(--bright);margin:0 0 7px;letter-spacing:.01em}
+p.lead{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:12px;max-width:80ch}
+p.lead strong,.note strong{color:var(--text);font-weight:600}
+.note{font-size:12.5px;color:var(--muted);line-height:1.65;margin-top:10px}
+.note+.note{margin-top:8px}
+.key{background:var(--accentBg);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;
+     padding:11px 13px;font-size:13px;line-height:1.6;color:var(--text);margin:12px 0}
+.key b{color:var(--accentTxt)}
+ul.bul{margin:8px 0 0 18px;font-size:12.5px;color:var(--muted);line-height:1.7}
+ul.bul li{margin-bottom:4px}
+ul.bul strong{color:var(--text)}
+
+/* ---------- controls ---------- */
+.ctl{margin-bottom:13px}
+.ctl:last-child{margin-bottom:0}
+.ctl-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:3px}
+.ctl-label{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.01em}
+.ctl-val{font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:var(--bright);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent);height:18px;cursor:pointer}
+.btnrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.btn{padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:var(--panel2);color:var(--muted);
+     cursor:pointer;font:inherit;font-size:12px;font-weight:600;transition:.12s}
+.btn:hover{border-color:var(--accent);color:var(--text)}
+.btn.active{border-color:var(--accent);background:var(--accentBg);color:var(--accentTxt)}
+.btn.prime{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="light"] .btn.prime{color:#fff}
+.btn.prime:hover{opacity:.88;color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
+.seg{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:12px;flex-wrap:wrap}
+.seg button{flex:1;min-width:90px;padding:8px 10px;border:none;background:var(--panel);color:var(--muted);
+            cursor:pointer;font:inherit;font-size:12.5px;font-weight:600;border-right:1px solid var(--border)}
+.seg button:last-child{border-right:none}
+.seg button.active{background:var(--accentBg);color:var(--accentTxt)}
+.chkrow{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}
+.chkrow label{display:flex;gap:5px;align-items:center;cursor:pointer;user-select:none}
+.chkrow input{accent-color:var(--accent);cursor:pointer}
+
+/* ---------- readout table ---------- */
+table.ro{width:100%;border-collapse:collapse;font-size:12.5px}
+table.ro td{padding:5px 2px;border-bottom:1px solid var(--border)}
+table.ro tr:last-child td{border-bottom:none}
+table.ro td:first-child{color:var(--muted)}
+table.ro td:last-child{text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--bright);
+                       font-variant-numeric:tabular-nums;white-space:nowrap}
+table.ro tr.hl td{background:var(--accentBg)}
+table.ro tr.hl td:last-child{color:var(--accentTxt)}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:baseline}
+
+svg{display:block;width:100%;height:auto;border-radius:10px}
+.svgbox{background:var(--svgbg);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+
+/* ---------- quiz ---------- */
+.q{border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;background:var(--panel2)}
+.q-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:8px}
+.q-num{font-size:11px;font-weight:700;color:var(--accentTxt);background:var(--accentBg);padding:2px 7px;border-radius:5px}
+.q-text{font-size:13.5px;line-height:1.6;margin-bottom:10px}
+.q-text .mono{color:var(--bright);font-weight:600}
+.opt{display:block;width:100%;text-align:left;padding:8px 11px;border-radius:7px;border:1.5px solid var(--border);
+     background:var(--panel);color:var(--text);cursor:pointer;font:inherit;font-size:12.5px;margin-bottom:5px;transition:.12s}
+.opt:hover{border-color:var(--accent)}
+.opt.right{border-color:var(--ok);background:var(--okBg);color:var(--ok);font-weight:600}
+.opt.wrong{border-color:var(--bad);background:var(--badBg);color:var(--bad);font-weight:600}
+.numin{padding:7px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--panel);color:var(--text);
+       font-family:'IBM Plex Mono',monospace;font-size:13px;width:150px}
+.numin:focus{outline:none;border-color:var(--accent)}
+.sol{margin-top:10px;padding:11px 13px;border-radius:8px;background:var(--panel);border:1px solid var(--border);
+     font-size:12.5px;line-height:1.7;color:var(--muted)}
+.sol strong{color:var(--text)}
+.sol .step{font-family:'IBM Plex Mono',monospace;color:var(--bright);display:block;margin:3px 0}
+footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--border);font-size:11.5px;color:var(--muted);line-height:1.7}
+footer a{color:var(--accentTxt)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <span class="chip">NCEA LEVEL 3 PHYSICS &middot; 91526 ELECTRICAL SYSTEMS &middot; AC CIRCUITS</span>
+    <h1>Reactance, Impedance and Resonance</h1>
+    <p class="sub">A capacitor and an inductor both fight the current without ever getting warm. This page is about how they do it, why the opposition depends on frequency, and why the current peaks when the two of them cancel out.</p>
+  </div>
+  <button class="themebtn" id="themebtn" onclick="toggleTheme()">Light mode</button>
+</header>
+
+<nav id="nav"></nav>
+<main id="view"></main>
+
+<footer>
+  Built for Level 3 Physics 91526. Everything runs in this one file, offline, no installation.
+  <br>Conventions used throughout: phasors rotate <b>anticlockwise</b>, and the <b>vertical projection</b> of a phasor is the instantaneous value.
+  In a series circuit the current is the same everywhere, so the current phasor is the reference.
+</footer>
+
+</div>
+
+<script>
+/* ==========================================================================
+   AC CIRCUITS  |  NCEA L3 Physics 91526
+   --------------------------------------------------------------------------
+   Series LCR model, all of it:
+       w   = 2 pi f
+       XL  = w L                 (ohms, rises with f)
+       XC  = 1 / (w C)           (ohms, falls with f)
+       X   = XL - XC             (net reactance, signed)
+       Z   = sqrt(R^2 + X^2)     (impedance)
+       phi = atan2(X, R)         (angle by which SUPPLY VOLTAGE leads CURRENT)
+       I   = V / Z
+       f0  = 1 / (2 pi sqrt(LC)) (resonance: XL = XC, X = 0, Z = R, I is max)
+
+   Waveforms, taking the current as the phase reference:
+       i(t)  = Ipk sin(th)
+       vR(t) = Ipk R  sin(th)          in phase with i
+       vL(t) = Ipk XL sin(th + 90)     leads i by 90
+       vC(t) = Ipk XC sin(th - 90)     lags  i by 90
+       v(t)  = Vpk    sin(th + phi)    and vR + vL + vC = v exactly
+   ========================================================================== */
+
+/* ---------- theme ---------- */
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  try{localStorage.setItem('ac-theme',t)}catch(e){}
+  var b=document.getElementById('themebtn');
+  if(b) b.textContent = (t==='dark' ? 'Light mode' : 'Dark mode');
+  P = readPalette();
+  if(typeof TABS!=='undefined' && TABS && TABS[cur]) TABS[cur].mount();
+}
+function toggleTheme(){
+  applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+function readPalette(){
+  var cs=getComputedStyle(document.documentElement), g=function(n){return cs.getPropertyValue('--'+n).trim()};
+  return {bg:g('svgbg'),grid:g('grid'),axis:g('axis'),text:g('text'),muted:g('muted'),bright:g('bright'),
+          border:g('border'),panel:g('panel'),panel2:g('panel2'),
+          R:g('cR'),L:g('cL'),C:g('cC'),I:g('cI'),V:g('cV'),accent:g('accent'),ok:g('ok'),bad:g('bad')};
+}
+var P = null;
+
+/* ---------- numbers ---------- */
+function sig(x,n){ n=n||3; if(!isFinite(x)) return '∞'; if(x===0) return '0';
+  var d=Math.ceil(Math.log10(Math.abs(x))), p=Math.max(0,n-d);
+  return x.toFixed(Math.min(p,8)).replace('-','−'); }
+/* engineering notation with SI prefix */
+function eng(x,unit,n){
+  n=n||3;
+  if(!isFinite(x)) return '∞ '+unit;
+  if(x===0) return '0 '+unit;
+  var a=Math.abs(x), pre='', m=x;
+  if(a>=1e9){pre='G';m=x/1e9} else if(a>=1e6){pre='M';m=x/1e6} else if(a>=1e3){pre='k';m=x/1e3}
+  else if(a>=1){pre='';m=x} else if(a>=1e-3){pre='m';m=x*1e3} else if(a>=1e-6){pre='µ';m=x*1e6}
+  else if(a>=1e-9){pre='n';m=x*1e9} else {pre='p';m=x*1e12}
+  return sig(m,n)+' '+pre+unit;
+}
+var DEG=180/Math.PI;
+
+/* ---------- shared circuit state (tabs 2 to 5 all read this) ---------- */
+var S = { V:12, f:120, R:60, L:0.10, C:1.0e-5 };
+var LIM = {
+  f:{min:5,max:5000,log:true,unit:'Hz'},
+  R:{min:1,max:1000,log:true,unit:'Ω'},
+  L:{min:0.001,max:2,log:true,unit:'H'},
+  C:{min:1e-7,max:1e-3,log:true,unit:'F'},
+  V:{min:1,max:50,log:false,unit:'V'}
+};
+
+/* ---------- the physics ---------- */
+function model(o){
+  o = o || {};
+  var hasR = o.hasR!==false, hasL = o.hasL!==false, hasC = o.hasC!==false;
+  var f=o.f||S.f, w=2*Math.PI*f;
+  var R  = hasR ? (o.R!==undefined?o.R:S.R) : 0;
+  var L  = (o.L!==undefined?o.L:S.L);
+  var C  = (o.C!==undefined?o.C:S.C);
+  var V  = (o.V!==undefined?o.V:S.V);
+  var XL = hasL ? w*L : 0;
+  var XC = hasC ? 1/(w*C) : 0;
+  var X  = XL - XC;
+  var Z  = Math.sqrt(R*R + X*X);
+  var phi= Math.atan2(X,R);              // + means supply voltage leads current
+  var Irms = Z>0 ? V/Z : Infinity;
+  var Ipk  = Irms*Math.SQRT2;
+  return {
+    f:f, w:w, R:R, L:L, C:C, V:V, hasR:hasR, hasL:hasL, hasC:hasC,
+    XL:XL, XC:XC, X:X, Z:Z, phi:phi, phiDeg:phi*DEG,
+    Irms:Irms, Ipk:Ipk, Vpk:V*Math.SQRT2,
+    VR:Irms*R, VL:Irms*XL, VC:Irms*XC,
+    VRpk:Ipk*R, VLpk:Ipk*XL, VCpk:Ipk*XC,
+    P:Irms*Irms*R,                                   // only the resistor dissipates
+    f0: (hasL&&hasC) ? 1/(2*Math.PI*Math.sqrt(L*C)) : NaN,
+    T: 1/f
+  };
+}
+
+/* ---------- svg helpers ---------- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+/* Unicode has no subscript C, so subscripts inside SVG text are drawn as tspans.
+   Pass raw:true to txt() when the string already contains tspan markup.          */
+function subs(main,sub,rest){
+  return main+'<tspan font-size="72%" dy="3">'+sub+'</tspan>'+
+         (rest?'<tspan dy="-3">'+rest.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</tspan>':'');
+}
+function svgOpen(w,h){ return '<svg viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg" '+
+  'style="background:'+P.bg+'" preserveAspectRatio="xMidYMid meet">'; }
+function txt(x,y,s,o){ o=o||{};
+  return '<text x="'+x+'" y="'+y+'" fill="'+(o.fill||P.muted)+'" font-size="'+(o.size||11)+'" '+
+    'font-weight="'+(o.w||400)+'" text-anchor="'+(o.anchor||'start')+'" '+
+    'font-family="'+(o.mono?"'IBM Plex Mono',monospace":"'IBM Plex Sans',sans-serif")+'" '+
+    (o.op!==undefined?'opacity="'+o.op+'" ':'')+'>'+(o.raw?s:esc(s))+'</text>'; }
+function line(x1,y1,x2,y2,c,w,dash,op){
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+(w||1)+'"'+
+    (dash?' stroke-dasharray="'+dash+'"':'')+(op!==undefined?' opacity="'+op+'"':'')+' stroke-linecap="round"/>'; }
+function poly(pts,c,w,dash,op){
+  var d=pts.map(function(p,i){return (i?'L':'M')+p[0].toFixed(2)+' '+p[1].toFixed(2)}).join(' ');
+  return '<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="'+(w||2)+'"'+
+    (dash?' stroke-dasharray="'+dash+'"':'')+(op!==undefined?' opacity="'+op+'"':'')+
+    ' stroke-linejoin="round" stroke-linecap="round"/>'; }
+function circ(x,y,r,fill,extra){ return '<circle cx="'+x+'" cy="'+y+'" r="'+r+'" fill="'+fill+'" '+(extra||'')+'/>'; }
+/* arrow from (x1,y1) to (x2,y2) */
+function arrow(x1,y1,x2,y2,c,w,head){
+  var dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy); if(len<0.5) return '';
+  head = head||Math.min(9, len*0.35);
+  var ux=dx/len, uy=dy/len, px=-uy, py=ux;
+  var bx=x2-ux*head, by=y2-uy*head;
+  return line(x1,y1,bx,by,c,w||2)+
+    '<path d="M'+x2+' '+y2+' L'+(bx+px*head*0.45)+' '+(by+py*head*0.45)+
+    ' L'+(bx-px*head*0.45)+' '+(by-py*head*0.45)+' Z" fill="'+c+'"/>';
+}
+function clampAbs(v,m){ return Math.max(-m,Math.min(m,v)); }
+
+/* ---------- control builders ---------- */
+function toSl(v,L){ return L.log ? 1000*Math.log(v/L.min)/Math.log(L.max/L.min) : 1000*(v-L.min)/(L.max-L.min); }
+function frSl(s,L){ return L.log ? L.min*Math.pow(L.max/L.min, s/1000) : L.min+(L.max-L.min)*s/1000; }
+/* a slider bound to a key of S */
+function slider(key,label,extra){
+  extra=extra||{};
+  var L=LIM[key];
+  return '<div class="ctl"><div class="ctl-top"><span class="ctl-label">'+label+'</span>'+
+    '<span class="ctl-val" id="rv_'+key+'">'+eng(S[key],L.unit)+'</span></div>'+
+    '<input type="range" min="0" max="1000" step="1" value="'+toSl(S[key],L).toFixed(1)+'" '+
+    'oninput="setS(\''+key+'\',this.value)" aria-label="'+label+'"></div>';
+}
+function setS(key,sv){
+  S[key]=frSl(+sv,LIM[key]);
+  var el=document.getElementById('rv_'+key);
+  if(el) el.textContent=eng(S[key],LIM[key].unit);
+  if(TABS[cur].onS) TABS[cur].onS();
+}
+/* push a value into S and refresh its slider position */
+function pushS(key,val){
+  S[key]=Math.max(LIM[key].min,Math.min(LIM[key].max,val));
+  var el=document.getElementById('rv_'+key); if(el) el.textContent=eng(S[key],LIM[key].unit);
+  var sl=document.querySelector('input[oninput*="setS(\''+key+'\'"]');
+  if(sl) sl.value=toSl(S[key],LIM[key]).toFixed(1);
+  if(TABS[cur].onS) TABS[cur].onS();
+}
+
+/* ---------- animation clock ----------
+   Real frequencies here are hundreds of hertz, far too fast to watch. So the
+   phase angle th advances at a fixed VISUAL rate instead: one cycle every
+   1/RATE seconds of wall clock, whatever the circuit frequency is. The graph
+   time axis still carries the real millisecond values, so speeding the circuit
+   up shows as a shorter period on the axis, not as a faster animation.        */
+var RATE = 0.28;          // cycles of the waveform per second of wall clock
+var paused = false;
+var th = 0;               // current phase angle, radians
+var lastTs = null, rafId = null;
+var CYCLES = 2.5;         // how many cycles the graph window shows
+
+function loop(ts){
+  rafId = requestAnimationFrame(loop);
+  if(lastTs===null) lastTs=ts;
+  var dt=Math.min(0.06,(ts-lastTs)/1000); lastTs=ts;
+  if(!paused) th=(th+2*Math.PI*RATE*dt) % (2*Math.PI*CYCLES);
+  if(TABS[cur] && TABS[cur].frame) TABS[cur].frame(th);
+}
+function togglePause(){ paused=!paused;
+  var b=document.getElementById('pausebtn'); if(b) b.textContent = paused?'Play':'Pause'; }
+function playbar(){
+  return '<div class="btnrow"><button class="btn" id="pausebtn" onclick="togglePause()">'+(paused?'Play':'Pause')+'</button>'+
+    '<button class="btn" onclick="th=0">Reset phase</button>'+
+    '<button class="btn" onclick="RATE=RATE>0.3?0.12:(RATE<0.16?0.22:0.45);">Speed</button></div>';
+}
+
+/* ==========================================================================
+   SHARED DRAWING WIDGETS
+   ========================================================================== */
+
+/* ---- circuit symbols, each drawn on a horizontal wire at (cx,cy) ---- */
+function symResistor(cx,cy,heat){
+  var w=66,h=11,n=6,s='';
+  s+='<rect x="'+(cx-w/2-4)+'" y="'+(cy-20)+'" width="'+(w+8)+'" height="40" fill="'+P.bg+'"/>';
+  if(heat>0.01) s+='<ellipse cx="'+cx+'" cy="'+cy+'" rx="'+(w/2+12)+'" ry="20" fill="'+P.R+'" opacity="'+(0.40*heat).toFixed(3)+'"/>';
+  var pts=[[cx-w/2,cy]], step=w/(n*2);
+  for(var i=0;i<n*2;i++) pts.push([cx-w/2+step*(i+0.5), cy+(i%2?h:-h)]);
+  pts.push([cx+w/2,cy]);
+  s+=poly(pts,P.R,2.4);
+  return s;
+}
+function symInductor(cx,cy,flux){
+  var w=66,n=4,r=w/(2*n),s='';
+  s+='<rect x="'+(cx-w/2-4)+'" y="'+(cy-26)+'" width="'+(w+8)+'" height="46" fill="'+P.bg+'"/>';
+  if(flux>0.01){
+    for(var k=1;k<=3;k++){
+      var rr=9+k*6;
+      s+='<ellipse cx="'+cx+'" cy="'+(cy-6)+'" rx="'+(w/2+k*5)+'" ry="'+rr+'" fill="none" stroke="'+P.L+
+         '" stroke-width="1" opacity="'+(0.45*flux/k).toFixed(3)+'"/>';
+    }
+  }
+  var d='M '+(cx-w/2)+' '+cy;
+  for(var i=0;i<n;i++){ var x=cx-w/2+2*r*i; d+=' A '+r+' '+r+' 0 0 1 '+(x+2*r)+' '+cy; }
+  s+='<path d="'+d+'" fill="none" stroke="'+P.L+'" stroke-width="2.4" stroke-linecap="round"/>';
+  return s;
+}
+function symCapacitor(cx,cy,q){          /* q in -1..1, signed fullness */
+  var gap=7,ph=17,s='';
+  s+='<rect x="'+(cx-34)+'" y="'+(cy-26)+'" width="68" height="52" fill="'+P.bg+'"/>';
+  s+=line(cx-34,cy,cx-gap,cy,P.C,2.4)+line(cx+gap,cy,cx+34,cy,P.C,2.4);
+  s+=line(cx-gap,cy-ph,cx-gap,cy+ph,P.C,3)+line(cx+gap,cy-ph,cx+gap,cy+ph,P.C,3);
+  var a=Math.min(1,Math.abs(q));
+  if(a>0.03){
+    var lft=q>0?'+':'−', rgt=q>0?'−':'+';
+    for(var i=-1;i<=1;i++){
+      s+=txt(cx-gap-7,cy+i*11+4,lft,{fill:P.C,size:12,w:700,anchor:'middle',op:a.toFixed(2)});
+      s+=txt(cx+gap+7,cy+i*11+4,rgt,{fill:P.C,size:12,w:700,anchor:'middle',op:a.toFixed(2)});
+    }
+  }
+  return s;
+}
+function symSource(cx,cy,v){             /* v in -1..1 */
+  var r=19,s='';
+  s+='<rect x="'+(cx-r-4)+'" y="'+(cy-r-4)+'" width="'+(2*r+8)+'" height="'+(2*r+8)+'" fill="'+P.bg+'"/>';
+  s+=circ(cx,cy,r,'none','stroke="'+P.V+'" stroke-width="2.2"');
+  var pts=[];
+  for(var i=0;i<=24;i++){ var t=i/24; pts.push([cx-11+22*t, cy-7*Math.sin(2*Math.PI*t)]); }
+  s+=poly(pts,P.V,2);
+  var a=Math.min(1,Math.abs(v));
+  s+=txt(cx,cy-r-8,(v>=0?'+':'−'),{fill:P.V,size:13,w:700,anchor:'middle',op:(0.25+0.75*a).toFixed(2)});
+  return s;
+}
+
+/* ---- rectangular loop geometry, used to run current dots round the wire ---- */
+function rectPts(x0,y0,x1,y1){ return [[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]]; }
+function pathInfo(pts){
+  var seg=[],tot=0;
+  for(var i=0;i<pts.length-1;i++){
+    var L=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);
+    seg.push({a:pts[i],b:pts[i+1],L:L,s0:tot}); tot+=L;
+  }
+  return {seg:seg,tot:tot};
+}
+function ptAt(info,s){
+  s=((s%info.tot)+info.tot)%info.tot;
+  for(var i=0;i<info.seg.length;i++){
+    var g=info.seg[i];
+    if(s<=g.s0+g.L){ var u=(s-g.s0)/g.L; return [g.a[0]+(g.b[0]-g.a[0])*u, g.a[1]+(g.b[1]-g.a[1])*u]; }
+  }
+  return info.seg[0].a;
+}
+/* dots whose DISPLACEMENT is the integral of the current, so their SPEED is the current */
+function currentDots(info,amp,th,colour,n){
+  n=n||40; var s='', step=info.tot/n, off=amp*(-Math.cos(th));
+  for(var k=0;k<n;k++){
+    var p=ptAt(info,k*step+off);
+    s+=circ(p[0].toFixed(1),p[1].toFixed(1),2.6,colour,'opacity="0.85"');
+  }
+  return s;
+}
+
+/* ---- waveform panel ----
+   cfg = {traces:[{label,color,amp,phase,dash}], scale:'each'|number,
+          th, T (period in s), title, yUnit}                                   */
+function wavePanel(x0,y0,w,h,cfg){
+  var s='', mid=y0+h/2, half=h/2-12, span=CYCLES*2*Math.PI;
+  var X=function(t){ return x0+w*t/span; };
+  /* grid: one vertical line every quarter cycle */
+  for(var q=0;q<=CYCLES*4;q++){
+    var xx=X(q*Math.PI/2), major=(q%4===0);
+    s+=line(xx,y0+2,xx,y0+h-2,major?P.axis:P.grid,1,major?null:'2,4',major?0.8:1);
+  }
+  s+=line(x0,mid,x0+w,mid,P.axis,1.2);
+  /* x axis labels in real milliseconds */
+  if(!cfg.noX) for(var c=0;c<=CYCLES;c++){
+    if(c>CYCLES-0.01 && CYCLES%1!==0) break;
+    s+=txt(X(c*2*Math.PI),y0+h+13,(c*cfg.T*1000).toFixed(cfg.T*1000<10?2:1),{size:9.5,anchor:'middle',mono:true});
+  }
+  if(!cfg.noX) s+=txt(x0+w,y0+h+13,'t / ms',{size:9.5,anchor:'end',fill:P.muted});
+  /* curves */
+  var gmax=0; cfg.traces.forEach(function(tr){ gmax=Math.max(gmax,Math.abs(tr.amp)); });
+  cfg.traces.forEach(function(tr){
+    var sc = (cfg.scale==='each') ? (tr.amp||1) : (cfg.scale||gmax||1);
+    var pts=[];
+    for(var i=0;i<=340;i++){
+      var t=span*i/340;
+      pts.push([X(t), mid-half*(tr.amp/sc)*Math.sin(t+tr.phase)]);
+    }
+    s+=poly(pts,tr.color,tr.width||2,tr.dash,tr.op);
+  });
+  /* cursor and the value markers on it */
+  var xc=X(cfg.th%span);
+  s+=line(xc,y0+2,xc,y0+h-2,P.muted,1,'3,3',0.55);
+  cfg.traces.forEach(function(tr){
+    var sc = (cfg.scale==='each') ? (tr.amp||1) : (cfg.scale||gmax||1);
+    var yv = mid-half*(tr.amp/sc)*Math.sin(cfg.th+tr.phase);
+    s+=circ(xc.toFixed(1),yv.toFixed(1),3.4,tr.color);
+  });
+  return s;
+}
+function waveLegend(x,y,traces,dx){
+  var s='';dx=dx||0;
+  traces.forEach(function(tr,i){
+    var xx=x+(dx?i*dx:0), yy=y+(dx?0:i*15);
+    s+='<rect x="'+xx+'" y="'+(yy-7)+'" width="9" height="9" rx="2" fill="'+tr.color+'"/>';
+    s+=txt(xx+13,yy+1,tr.label,{size:10.5,fill:P.text,w:600,raw:true});
+  });
+  return s;
+}
+
+/* ---- phasor panel ----
+   items = [{label,color,mag,phase,dash}]; mag already normalised 0..1         */
+function phasorPanel(cx,cy,r,items,th,opts){
+  opts=opts||{};
+  var s='';
+  s+=circ(cx,cy,r,'none','stroke="'+P.grid+'" stroke-width="1"');
+  s+=line(cx-r-10,cy,cx+r+10,cy,P.axis,1,'3,4',0.7);
+  s+=line(cx,cy-r-10,cx,cy+r+10,P.axis,1,'3,4',0.7);
+  if(opts.spin!==false){
+    s+='<path d="M '+(cx+r*0.80)+' '+(cy-r*0.46)+' A '+(r*0.92)+' '+(r*0.92)+' 0 0 0 '+(cx+r*0.46)+' '+(cy-r*0.80)+
+       '" fill="none" stroke="'+P.muted+'" stroke-width="1" opacity="0.5"/>';
+    s+=txt(cx+r*0.62,cy-r*0.86,'↺',{size:13,fill:P.muted,anchor:'middle'});
+  }
+  items.forEach(function(it){
+    if(!isFinite(it.mag)||Math.abs(it.mag)<0.004) return;
+    var a=th+it.phase, ex=cx+r*it.mag*Math.cos(a), ey=cy-r*it.mag*Math.sin(a);
+    if(it.dash) s+=line(cx,cy,ex,ey,it.color,1.8,it.dash,0.9);
+    else s+=arrow(cx,cy,ex,ey,it.color,2.4,10);
+    if(opts.project) s+=line(ex,ey,cx+r+14,ey,it.color,1,'2,3',0.45);
+    if(it.label) s+=txt(ex+(Math.cos(a)>=0?7:-7), ey+(Math.sin(a)>=0?-5:13), it.label,
+                        {size:11,w:700,fill:it.color,anchor:Math.cos(a)>=0?'start':'end',raw:true});
+  });
+  return s;
+}
+
+/* ---- plot of an arbitrary function of the phase angle ---- */
+function funcPanel(x0,y0,w,h,cfg){
+  var s='', span=CYCLES*2*Math.PI, X=function(t){return x0+w*t/span;};
+  var lo=cfg.ymin, hi=cfg.ymax, Y=function(v){ return y0+h-(h-8)*(v-lo)/(hi-lo||1); };
+  for(var q=0;q<=CYCLES*4;q++){
+    var xx=X(q*Math.PI/2), major=(q%4===0);
+    s+=line(xx,y0,xx,y0+h,major?P.axis:P.grid,1,major?null:'2,4',major?0.8:1);
+  }
+  s+=line(x0,Y(0),x0+w,Y(0),P.axis,1.2);
+  if(cfg.hline!==undefined){
+    s+=line(x0,Y(cfg.hline),x0+w,Y(cfg.hline),cfg.hcolor||P.muted,1.4,'6,4');
+    s+=txt(x0+w-4,Y(cfg.hline)-5,cfg.hlabel||'',{size:10,anchor:'end',fill:cfg.hcolor||P.muted,w:600});
+  }
+  var pts=[];
+  for(var i=0;i<=340;i++){ var t=span*i/340; pts.push([X(t),Y(cfg.fn(t))]); }
+  if(cfg.fill) s+='<path d="M'+X(0)+' '+Y(0)+' '+pts.map(function(p){return 'L'+p[0].toFixed(1)+' '+p[1].toFixed(1)}).join(' ')+
+                  ' L'+X(span)+' '+Y(0)+' Z" fill="'+cfg.color+'" opacity="0.16"/>';
+  s+=poly(pts,cfg.color,2);
+  var xc=X(cfg.th%span);
+  s+=line(xc,y0,xc,y0+h,P.muted,1,'3,3',0.55);
+  s+=circ(xc.toFixed(1),Y(cfg.fn(cfg.th%span)).toFixed(1),3.4,cfg.color);
+  return s;
+}
+
+/* ---- reactance against frequency, the classic textbook sketch ---- */
+function reactancePanel(x0,y0,w,h,which){
+  var s='', fmax=Math.max(S.f*2.6, (isFinite(model().f0)?model().f0*2.2:0), 60);
+  var XLf=function(f){return 2*Math.PI*f*S.L;}, XCf=function(f){return 1/(2*Math.PI*f*S.C);};
+  var ymax;
+  if(which==='L') ymax=Math.max(XLf(fmax),1)*1.05;
+  else if(which==='C') ymax=Math.max(XCf(fmax*0.10),1);
+  else if(which==='R') ymax=Math.max(S.R*2,1);
+  else ymax=Math.max(XLf(fmax), XCf(fmax*0.12), S.R*1.4)*1.02;
+  var X=function(f){return x0+w*f/fmax;}, Y=function(v){return y0+h-h*Math.min(v,ymax)/ymax;};
+  s+='<rect x="'+x0+'" y="'+y0+'" width="'+w+'" height="'+h+'" fill="none" stroke="'+P.grid+'" stroke-width="1"/>';
+  s+=line(x0,y0+h,x0+w,y0+h,P.axis,1.2)+line(x0,y0,x0,y0+h,P.axis,1.2);
+  s+=txt(x0+w,y0+h+14,'frequency / Hz',{size:10,anchor:'end'});
+  s+=txt(x0+2,y0-6,'reactance / Ω',{size:10});
+  function curve(fn,col,lab){
+    var pts=[];
+    for(var i=1;i<=260;i++){ var f=fmax*i/260, v=fn(f); if(v>ymax*1.6) continue; pts.push([X(f),Y(v)]); }
+    var out=poly(pts,col,2.2);
+    if(pts.length) out+=txt(pts[pts.length-1][0]-4,pts[pts.length-1][1]-7,lab,{size:11.5,w:700,fill:col,anchor:'end',raw:true});
+    return out;
+  }
+  if(which==='L'||which==='both') s+=curve(XLf,P.L,subs('X','L',' = ωL'));
+  if(which==='C'||which==='both') s+=curve(XCf,P.C,subs('X','C',' = 1/ωC'));
+  if(which==='R') s+=line(x0,Y(S.R),x0+w,Y(S.R),P.R,2.2)+txt(x0+w-4,Y(S.R)-7,'R',{size:11,w:700,fill:P.R,anchor:'end'});
+  /* marker at the working frequency */
+  var xf=X(Math.min(S.f,fmax));
+  s+=line(xf,y0,xf,y0+h,P.accent,1.4,'4,3',0.85);
+  s+=txt(xf,y0-6,eng(S.f,'Hz',3),{size:10,anchor:'middle',fill:P.accent,w:700,mono:true});
+  if(which==='L') s+=circ(xf,Y(XLf(S.f)),4,P.L);
+  if(which==='C') s+=circ(xf,Y(XCf(S.f)),4,P.C);
+  if(which==='R') s+=circ(xf,Y(S.R),4,P.R);
+  if(which==='both'){
+    s+=circ(xf,Y(XLf(S.f)),4,P.L); s+=circ(xf,Y(XCf(S.f)),4,P.C);
+    var f0=model().f0;
+    if(isFinite(f0)&&f0<fmax){
+      s+=line(X(f0),y0,X(f0),y0+h,P.ok,1.4,'5,3',0.9);
+      s+=txt(X(f0),y0+h-6,'f₀',{size:11,anchor:'middle',fill:P.ok,w:700});
+    }
+  }
+  return s;
+}
+
+/* ==========================================================================
+   TAB 1  |  AC, peak and rms
+   ========================================================================== */
+var T1 = { E:[0,0] };
+var TAB1 = {
+  label:'AC and rms', n:'1',
+  mount:function(){
+    document.getElementById('view').innerHTML =
+      '<div class="grid g-73">'+
+        '<div class="stack">'+
+          '<div class="panel"><h2 class="sec">A resistor on an AC supply</h2>'+
+          '<p class="lead">Only a resistor here, no capacitor and no inductor. At every instant Ohm’s law still holds, '+
+          'so <strong>i = v / R</strong> moment by moment: the two waves peak together and cross zero together. '+
+          'They are <strong>in phase</strong>. That is the baseline everything else is measured against.</p>'+
+          '<div class="svgbox" id="t1a"></div></div>'+
+          '<div class="panel"><h2 class="sec">Why r.m.s. and not the average</h2>'+
+          '<p class="lead">The average of the current over a cycle is <strong>zero</strong>, yet the resistor plainly gets hot. '+
+          'Power is p = i²R, and squaring destroys the minus signs, so the power curve below never goes negative: '+
+          'the resistor is heated on both halves of the cycle.</p>'+
+          '<div class="svgbox" id="t1b"></div>'+
+          '<div class="key">The average of sin² over a cycle is exactly <b>&frac12;</b>, so the mean power is '+
+          '<b>&frac12; V<sub>pk</sub>I<sub>pk</sub></b>. The steady DC values that would deliver that same power are '+
+          '<b>V<sub>pk</sub>/&radic;2</b> and <b>I<sub>pk</sub>/&radic;2</b>. Those are the r.m.s. values. '+
+          'An r.m.s. value is not an average of the wave; it is <b>the DC that would heat the resistor equally</b>.</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="stack">'+
+          '<div class="panel"><h3 class="sub3">Supply</h3>'+
+            slider('V','Supply voltage (r.m.s.)')+slider('R','Resistance R')+slider('f','Frequency f')+
+            playbar()+
+          '</div>'+
+          '<div class="panel"><h3 class="sub3">Readout</h3><div id="t1ro"></div></div>'+
+          '<div class="panel"><h3 class="sub3">Same heat, same brightness</h3>'+
+          '<p class="lead" style="margin-bottom:8px">The left lamp runs on the AC supply, the right lamp on a steady DC supply '+
+          'set to the r.m.s. voltage. The AC lamp flickers at twice the supply frequency, but the energy bars fill at the same rate.</p>'+
+          '<div class="svgbox" id="t1c"></div></div>'+
+        '</div>'+
+      '</div>';
+    T1.E=[0,0];
+    this.onS();
+  },
+  onS:function(){
+    var m=model({hasL:false,hasC:false});
+    document.getElementById('t1ro').innerHTML =
+      '<table class="ro">'+
+      row('V<sub>rms</sub>',eng(m.V,'V'))+row('V<sub>peak</sub> = &radic;2 V<sub>rms</sub>',eng(m.Vpk,'V'))+
+      row('I<sub>rms</sub> = V<sub>rms</sub>/R',eng(m.Irms,'A'))+row('I<sub>peak</sub>',eng(m.Ipk,'A'))+
+      row('Peak power',eng(m.Vpk*m.Ipk,'W'))+
+      '<tr class="hl"><td>Mean power = V<sub>rms</sub>I<sub>rms</sub></td><td>'+eng(m.V*m.Irms,'W')+'</td></tr>'+
+      row('Period T = 1/f',eng(m.T,'s'))+
+      '</table>';
+  },
+  frame:function(th){
+    var m=model({hasL:false,hasC:false});
+    var W=880,H=250;
+    var s=svgOpen(W,H);
+    /* the two traces sit exactly on top of each other, which is the point, so the
+       current is drawn as a dashed line over a thicker solid voltage trace        */
+    s+=wavePanel(52,26,790,190,{traces:[
+        {label:'v',color:P.V,amp:m.Vpk,phase:0,width:3.4},
+        {label:'i',color:P.I,amp:m.Ipk,phase:0,dash:'11,8',width:2.2}
+      ],scale:'each',th:th,T:m.T});
+    s+=waveLegend(56,17,[{label:'supply voltage v',color:P.V},{label:'current i (same phase)',color:P.I}],150);
+    s+=txt(14,124,'↑ v, i',{size:10,fill:P.muted});
+    s+=txt(W-10,H-6,'the two traces are drawn to their own scales; what matters is that they line up',{size:9.5,anchor:'end',op:0.75});
+    s+='</svg>';
+    document.getElementById('t1a').innerHTML=s;
+
+    /* power panel */
+    var Ppk=m.Vpk*m.Ipk, W2=880,H2=210;
+    var s2=svgOpen(W2,H2);
+    s2+=funcPanel(52,26,790,150,{fn:function(t){var q=Math.sin(t);return Ppk*q*q;},
+        color:P.R,ymin:0,ymax:Ppk*1.12,th:th,fill:true,hline:Ppk/2,hcolor:P.accent,
+        hlabel:'mean power = ½ Pₚₖ = Vᵣₘₛ Iᵣₘₛ = '+eng(m.V*m.Irms,'W')});
+    s2+=txt(52,17,'instantaneous power p = i²R  (never negative, and it wobbles at 2f)',{size:10.5,fill:P.text,w:600});
+    s2+=txt(14,110,'↑ p',{size:10,fill:P.muted});
+    s2+=txt(46,182,'0',{size:9.5,anchor:'end',mono:true});
+    s2+='</svg>';
+    document.getElementById('t1b').innerHTML=s2;
+
+    /* two lamps, energy bars */
+    var q=Math.sin(th), pac=q*q, pdc=0.5;
+    T1.E[0]+=pac*0.010; T1.E[1]+=pdc*0.010;
+    if(T1.E[1]>1){T1.E=[Math.max(0,T1.E[0]-1),T1.E[1]-1];}
+    var W3=420,H3=250, s3=svgOpen(W3,H3);
+    [[110,'AC supply',pac,P.V],[310,'DC at Vᵣₘₛ',pdc,P.accent]].forEach(function(d,i){
+      var cx=d[0], b=d[2];
+      s3+=circ(cx,72,34,d[3],'opacity="'+(0.10+0.55*b).toFixed(3)+'"');
+      s3+=circ(cx,72,22,d[3],'opacity="'+(0.18+0.82*b).toFixed(3)+'"');
+      s3+=circ(cx,72,22,'none','stroke="'+P.muted+'" stroke-width="1.5"');
+      s3+=line(cx-16,56,cx+16,88,P.bg,2)+line(cx+16,56,cx-16,88,P.bg,2);
+      s3+=txt(cx,128,d[1],{size:11.5,anchor:'middle',fill:P.text,w:700});
+      s3+=txt(cx,145,'p = '+(b*100).toFixed(0)+'% of peak',{size:10,anchor:'middle',mono:true});
+      /* energy bar */
+      var bx=cx-52, by=166, bw=104, bh=16;
+      s3+='<rect x="'+bx+'" y="'+by+'" width="'+bw+'" height="'+bh+'" rx="4" fill="none" stroke="'+P.border+'"/>';
+      s3+='<rect x="'+bx+'" y="'+by+'" width="'+(bw*Math.max(0,Math.min(1,T1.E[i]))).toFixed(1)+'" height="'+bh+'" rx="4" fill="'+d[3]+'" opacity="0.8"/>';
+      s3+=txt(cx,by+bh+15,'energy delivered',{size:9.5,anchor:'middle'});
+    });
+    s3+=txt(W3/2,224,'Both bars fill at the same average rate.',{size:11,anchor:'middle',fill:P.ok,w:700});
+    s3+=txt(W3/2,240,'That is what r.m.s. means.',{size:10.5,anchor:'middle',fill:P.muted});
+    s3+='</svg>';
+    document.getElementById('t1c').innerHTML=s3;
+  }
+};
+function row(a,b){ return '<tr><td>'+a+'</td><td>'+b+'</td></tr>'; }
+
+/* ---- centre-zero bar gauge ---- */
+function barGauge(x,y,w,h,val,max,col,label,valTxt){
+  var s='', cx=x+w/2, f=Math.max(-1,Math.min(1,val/(max||1)));
+  s+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="none" stroke="'+P.border+'"/>';
+  var bw=Math.abs(f)*w/2;
+  s+='<rect x="'+(f>=0?cx:cx-bw)+'" y="'+(y+1)+'" width="'+bw.toFixed(1)+'" height="'+(h-2)+'" fill="'+col+'" opacity="0.85"/>';
+  s+=line(cx,y,cx,y+h,P.axis,1);
+  s+=txt(x,y-5,label,{size:10,fill:P.text,w:600});
+  if(valTxt) s+=txt(x+w,y-5,valTxt,{size:10,anchor:'end',mono:true,fill:col,w:600});
+  return s;
+}
+
+/* ==========================================================================
+   TAB 2  |  one component at a time
+   ========================================================================== */
+var T2 = { comp:'C' };
+var COMPINFO = {
+  R:{ name:'Resistor', col:'R', sym:'R', unit:'Ω',
+      delta:0,
+      head:'Voltage and current stay in step',
+      why:'<p class="lead">A resistor has no memory. Push harder and the charges immediately drift faster; stop pushing and they immediately stop. '+
+           'So <strong>i = v/R at every instant</strong>, and the two waves rise, peak and cross zero together: a phase difference of <strong>0°</strong>.</p>'+
+           '<div class="key">R does not depend on frequency at all. The line on the graph below is flat. Energy really is lost here: '+
+           'the drifting charges collide with the lattice and the resistor warms up.</div>',
+      freq:'Changing the frequency changes nothing. A resistor at 5 Hz behaves exactly as it does at 5 kHz.' },
+  C:{ name:'Capacitor', col:'C', sym:'X<sub>C</sub>', unit:'Ω',
+      delta:-Math.PI/2,
+      head:'Current leads the voltage by 90°',
+      why:'<p class="lead">A capacitor’s voltage comes from the <strong>charge that has piled up</strong> on its plates, and charge piles up '+
+           'only because current has been flowing. So the voltage is the <strong>running total</strong> of the current, and a running total '+
+           'always lags behind what feeds it.</p>'+
+           '<div class="key">The sentence to remember: <b>the current is largest when the plates are empty, and zero when the plates are full.</b> '+
+           'Empty plates push back with nothing, so charge floods in. Full plates push back as hard as the supply pushes, so everything stops. '+
+           'Those two events are a quarter of a cycle apart, which is the 90°.</div>',
+      freq:'<strong>High frequency, small X<sub>C</sub>.</strong> The supply reverses before much charge can gather, so the plates never build up '+
+           'much opposing voltage and a large current keeps sloshing in and out. <strong>Low frequency, large X<sub>C</sub>.</strong> '+
+           'There is plenty of time to fill the plates right up, the back voltage almost matches the supply, and the current dies away. '+
+           'At f = 0, DC, the plates simply stay full and nothing flows at all: a capacitor blocks DC.' },
+  L:{ name:'Inductor', col:'L', sym:'X<sub>L</sub>', unit:'Ω',
+      delta:Math.PI/2,
+      head:'Current lags the voltage by 90°',
+      why:'<p class="lead">An inductor produces a voltage only when the current <strong>changes</strong>: ε = −L ΔI/Δt. '+
+           'The voltage is therefore the <strong>rate of change</strong> of the current, and a rate of change runs ahead of the thing it measures.</p>'+
+           '<div class="key">The sentence to remember: <b>the induced voltage is largest when the current is passing through zero, and zero when '+
+           'the current is at its peak.</b> At the peak the current is momentarily steady, so there is nothing to induce. Crossing zero it is '+
+           'changing fastest, so the back EMF is at its biggest. Again a quarter of a cycle, again 90°.</div>',
+      freq:'<strong>High frequency, large X<sub>L</sub>.</strong> The current is being forced to reverse very quickly, ΔI/Δt is huge, '+
+           'and the back EMF fights back hard. <strong>Low frequency, small X<sub>L</sub>.</strong> The current changes lazily, barely any EMF is '+
+           'induced, and the coil is close to being an ordinary piece of wire. At f = 0, DC, it <em>is</em> just a piece of wire.' }
+};
+var TAB2 = {
+  label:'One component at a time', n:'2',
+  mount:function(){
+    var c=T2.comp, I=COMPINFO[c];
+    document.getElementById('view').innerHTML =
+      '<div class="seg">'+
+        ['R','C','L'].map(function(k){return '<button class="'+(k===c?'active':'')+'" onclick="T2.comp=\''+k+'\';TABS[cur].mount()">'+
+          COMPINFO[k].name+' only</button>';}).join('')+
+      '</div>'+
+      '<div class="grid g-73">'+
+        '<div class="stack">'+
+          '<div class="panel"><h2 class="sec">'+I.head+'</h2>'+
+          '<p class="lead">The phasor on the left turns anticlockwise once per cycle. Its <strong>height above the axis</strong> is the '+
+          'instantaneous value, which is exactly what the wave on the right traces out. Watch which arrow gets to the top first.</p>'+
+          '<div class="svgbox" id="t2a"></div></div>'+
+          '<div class="panel"><h2 class="sec">What is physically happening</h2>'+
+          '<div class="svgbox" id="t2b"></div>'+
+          '<p class="note" id="t2narr" style="min-height:34px"></p></div>'+
+        '</div>'+
+        '<div class="stack">'+
+          '<div class="panel"><h3 class="sub3">Controls</h3>'+
+            slider('V','Supply voltage (r.m.s.)')+slider('f','Frequency f')+
+            (c==='R'?slider('R','Resistance R'):c==='C'?slider('C','Capacitance C'):slider('L','Inductance L'))+
+            playbar()+
+          '</div>'+
+          '<div class="panel"><h3 class="sub3">Readout</h3><div id="t2ro"></div></div>'+
+          '<div class="panel"><h3 class="sub3">'+I.name+': the reasoning</h3>'+I.why+'</div>'+
+          '<div class="panel"><h3 class="sub3">Dependence on frequency</h3>'+
+            '<div class="svgbox" id="t2c"></div>'+
+            '<p class="note">'+I.freq+'</p></div>'+
+        '</div>'+
+      '</div>';
+    this.onS();
+  },
+  onS:function(){
+    var c=T2.comp, m=this.m();
+    var rows;
+    if(c==='R') rows=row('Resistance R',eng(S.R,'Ω'))+row('Frequency f',eng(S.f,'Hz'))+
+                     '<tr class="hl"><td>Opposition to current</td><td>'+eng(S.R,'Ω')+'</td></tr>';
+    else if(c==='C') rows=row('Capacitance C',eng(S.C,'F'))+row('Frequency f',eng(S.f,'Hz'))+
+                     row('ω = 2πf',eng(2*Math.PI*S.f,'rad s⁻¹'))+
+                     '<tr class="hl"><td>X<sub>C</sub> = 1/ωC</td><td>'+eng(m.X,'Ω')+'</td></tr>';
+    else rows=row('Inductance L',eng(S.L,'H'))+row('Frequency f',eng(S.f,'Hz'))+
+              row('ω = 2πf',eng(2*Math.PI*S.f,'rad s⁻¹'))+
+              '<tr class="hl"><td>X<sub>L</sub> = ωL</td><td>'+eng(m.X,'Ω')+'</td></tr>';
+    rows+=row('I<sub>rms</sub> = V<sub>rms</sub> / '+COMPINFO[c].sym,eng(m.Irms,'A'))+
+          row('Phase of current',c==='R'?'in phase with v':(c==='C'?'leads v by 90°':'lags v by 90°'))+
+          row('Power dissipated',c==='R'?eng(m.Irms*m.Irms*S.R,'W'):'0 W (none)');
+    document.getElementById('t2ro').innerHTML='<table class="ro">'+rows+'</table>';
+    document.getElementById('t2c').innerHTML=(function(){
+      var s=svgOpen(430,250); s+=reactancePanel(46,26,350,180,c); s+='</svg>'; return s; })();
+  },
+  m:function(){   /* the single component, on its own */
+    var c=T2.comp, w=2*Math.PI*S.f;
+    var X = c==='R'? S.R : c==='C' ? 1/(w*S.C) : w*S.L;
+    return {X:X, Irms:S.V/X, Ipk:S.V*Math.SQRT2/X, Vpk:S.V*Math.SQRT2};
+  },
+  frame:function(th){
+    var c=T2.comp, I=COMPINFO[c], col=P[I.col], m=this.m();
+    var W=940,H=300, cx=115,cy=150,r=95, gx=265, gw=650, y0=43, hgt=214;
+    var span=CYCLES*2*Math.PI, X=function(t){return gx+gw*t/span;};
+    var s=svgOpen(W,H);
+    /* phasors: current is the reference, voltage sits delta ahead of it */
+    s+=phasorPanel(cx,cy,r,[
+        {label:'I',color:P.I,mag:1,phase:0},
+        {label:'V',color:P.V,mag:0.78,phase:I.delta}
+      ],th,{});
+    s+=txt(cx,cy+r+34,'phasors (anticlockwise)',{size:10,anchor:'middle'});
+    /* waves */
+    s+=wavePanel(gx,y0,gw,hgt,{traces:[
+        {label:'v',color:P.V,amp:m.Vpk,phase:I.delta},
+        {label:'i',color:P.I,amp:m.Ipk,phase:0}
+      ],scale:'each',th:th,T:1/S.f});
+    /* the link between phasor tip and wave value */
+    var xc=X(th%span);
+    [[1,0,P.I],[0.78,I.delta,P.V]].forEach(function(d){
+      var a=th+d[1], ey=cy-r*d[0]*Math.sin(a), wy=cy-95*Math.sin(a);
+      s+=line(cx+r*d[0]*Math.cos(a),ey,gx-6,wy,d[2],1,'3,4',0.35);
+      s+=line(gx-6,wy,xc,wy,d[2],1,'3,4',0.35);
+    });
+    s+=waveLegend(gx+4,20,[{label:'voltage v',color:P.V},{label:'current i',color:P.I}],110);
+    s+=txt(W-8,H-6,'each trace drawn to its own scale',{size:9,anchor:'end',op:0.7});
+    s+='</svg>';
+    document.getElementById('t2a').innerHTML=s;
+    document.getElementById('t2b').innerHTML=this.cause(th);
+    document.getElementById('t2narr').innerHTML=this.narrate(th);
+  },
+  /* ---- the mechanism picture, different for each component ---- */
+  cause:function(th){
+    var c=T2.comp, W=940,H=220, s=svgOpen(W,H);
+    var i=Math.sin(th);                 /* current, normalised          */
+    var v=Math.sin(th+COMPINFO[c].delta);
+    if(c==='R'){
+      var y=96;
+      s+='<rect x="130" y="'+(y-40)+'" width="600" height="80" rx="8" fill="'+P.R+'" opacity="'+(0.06+0.22*i*i).toFixed(3)+'"/>';
+      s+='<rect x="130" y="'+(y-40)+'" width="600" height="80" rx="8" fill="none" stroke="'+P.R+'" stroke-width="1.5"/>';
+      for(var rI=0;rI<4;rI++) for(var cI=0;cI<12;cI++){
+        var lx=165+cI*50, ly=y-27+rI*18;
+        s+=circ(lx,ly,4,P.R,'opacity="0.35"');
+      }
+      var drift=-Math.cos(th)*26;
+      for(var k=0;k<46;k++){
+        var ex=150+((k*13.4+drift)%580+580)%580, ey=y-32+((k*37)%64);
+        s+=circ(ex.toFixed(1),ey.toFixed(1),2.6,P.I,'opacity="0.9"');
+      }
+      s+=arrow(430-i*70,y-62,430+i*70,y-62,P.V,2.5,9);
+      s+=txt(430,y-72,'applied field',{size:10,anchor:'middle',fill:P.V});
+      s+=txt(130,y+58,'The electrons respond instantly: field right, drift right. No storage, no delay, and the collisions turn the work into heat.',{size:11,fill:P.muted});
+      s+=barGauge(760,60,150,14,i,1,P.I,'current i');
+      s+=barGauge(760,110,150,14,v,1,P.V,'voltage v');
+      s+=txt(760,150,'The two bars move together.',{size:10.5,fill:P.text,w:600});
+    }
+    if(c==='C'){
+      var q=-Math.cos(th);              /* charge, the running total of i */
+      var px=440, ph=72;
+      s+=line(150,110,px-16,110,P.C,2.5)+line(px+16,110,730,110,P.C,2.5);
+      s+=line(px-16,110-ph,px-16,110+ph,P.C,4)+line(px+16,110-ph,px+16,110+ph,P.C,4);
+      var a=Math.abs(q), nch=Math.round(6*a);
+      for(var j=0;j<nch;j++){
+        var yy=110-ph+12+j*((2*ph-24)/5);
+        s+=txt(px-27,yy+4,q>0?'+':'−',{size:15,w:700,fill:P.C,anchor:'middle',op:(0.35+0.65*a).toFixed(2)});
+        s+=txt(px+27,yy+4,q>0?'−':'+',{size:15,w:700,fill:P.C,anchor:'middle',op:(0.35+0.65*a).toFixed(2)});
+      }
+      var info=pathInfo([[150,110],[px-16,110]]), info2=pathInfo([[px+16,110],[730,110]]);
+      for(var d=0;d<16;d++){
+        var off=-Math.cos(th)*40;
+        var p1=ptAt(info,(d*18+off+500)%info.tot), p2=ptAt(info2,(d*18+off+500)%info2.tot);
+        s+=circ(p1[0].toFixed(1),p1[1].toFixed(1),2.6,P.I,'opacity="0.9"');
+        s+=circ(p2[0].toFixed(1),p2[1].toFixed(1),2.6,P.I,'opacity="0.9"');
+      }
+      if(Math.abs(i)>0.06) s+=arrow(px-150-Math.sign(i)*26,60,px-150+Math.sign(i)*26,60,P.I,2.5,9);
+      s+=txt(px-150,48,'current',{size:10,anchor:'middle',fill:P.I});
+      s+=txt(150,205,'Charge piles up on the plates. The plate voltage is that pile, so it always runs a quarter cycle behind the current that built it.',{size:11,fill:P.muted});
+      s+=barGauge(760,54,150,14,i,1,P.I,'current i');
+      s+=barGauge(760,104,150,14,q,1,P.C,'charge Q, and so v');
+      s+=txt(760,146,'Q lags i by a quarter cycle.',{size:10.5,fill:P.text,w:600});
+    }
+    if(c==='L'){
+      var cxL=430, n=5, rr=26;
+      var d2='M '+(cxL-n*rr)+' 110';
+      for(var q2=0;q2<n;q2++){ var xq=cxL-n*rr+2*rr*q2; d2+=' A '+rr+' '+rr+' 0 0 1 '+(xq+2*rr)+' 110'; }
+      var fl=Math.abs(i);
+      for(var k2=1;k2<=4;k2++)
+        s+='<ellipse cx="'+cxL+'" cy="96" rx="'+(n*rr+k2*16)+'" ry="'+(26+k2*13)+'" fill="none" stroke="'+P.L+
+           '" stroke-width="1.2" opacity="'+(0.55*fl/k2).toFixed(3)+'"/>';
+      s+=line(150,110,cxL-n*rr,110,P.L,2.5)+line(cxL+n*rr,110,730,110,P.L,2.5);
+      s+='<path d="'+d2+'" fill="none" stroke="'+P.L+'" stroke-width="3" stroke-linecap="round"/>';
+      var infoL=pathInfo([[150,110],[cxL-n*rr,110]]), infoR=pathInfo([[cxL+n*rr,110],[730,110]]);
+      for(var d3=0;d3<10;d3++){
+        var off2=-Math.cos(th)*40;
+        var q3=ptAt(infoL,(d3*16+off2+400)%infoL.tot), q4=ptAt(infoR,(d3*16+off2+400)%infoR.tot);
+        s+=circ(q3[0].toFixed(1),q3[1].toFixed(1),2.6,P.I,'opacity="0.9"');
+        s+=circ(q4[0].toFixed(1),q4[1].toFixed(1),2.6,P.I,'opacity="0.9"');
+      }
+      s+=txt(cxL,186,'magnetic field stored in the coil, strongest when the current is strongest',{size:10.5,anchor:'middle',fill:P.muted});
+      s+=txt(150,208,'The coil only reacts to CHANGE. A steady current induces nothing; a fast reversal induces a lot.',{size:11,fill:P.muted});
+      s+=barGauge(760,54,150,14,i,1,P.I,'current i');
+      s+=barGauge(760,104,150,14,v,1,P.L,'rate of change, and so v');
+      s+=txt(760,146,'v peaks where i crosses zero.',{size:10.5,fill:P.text,w:600});
+    }
+    s+='</svg>';
+    return s;
+  },
+  narrate:function(th){
+    var c=T2.comp, i=Math.sin(th), co=Math.cos(th);
+    if(c==='R') return '<strong>Nothing to wait for.</strong> The current is whatever the voltage says it should be, right now. Phase difference zero.';
+    if(c==='C'){
+      var q=-co;
+      if(Math.abs(i)>0.9) return '<strong>Plates almost empty, current at its largest.</strong> There is hardly any charge on the plates, so almost nothing is pushing back against the supply.';
+      if(Math.abs(q)>0.9) return '<strong>Plates full, current has stopped.</strong> The capacitor is now pushing back just as hard as the supply pushes, so no more charge can move.';
+      return (q*i>0) ? '<strong>Filling.</strong> Charge is still arriving, the back voltage is growing, and the current is falling away.'
+                     : '<strong>Emptying.</strong> The plates are draining, the back voltage is shrinking, and the current is building again.';
+    }
+    if(Math.abs(i)>0.9) return '<strong>Current at its peak, induced voltage zero.</strong> For this instant the current is not changing, so there is no changing flux and nothing is induced.';
+    if(Math.abs(co)>0.9) return '<strong>Current passing through zero, induced voltage at its largest.</strong> This is where the current is changing fastest, so the back EMF is biggest here.';
+    return (i*co>0) ? '<strong>Current still rising.</strong> Flux is growing, and the coil opposes that growth.'
+                    : '<strong>Current falling.</strong> Flux is collapsing, and the coil opposes that too, trying to keep the current going.';
+  }
+};
+
+/* ==========================================================================
+   TAB 3  |  the mechanical twin
+   --------------------------------------------------------------------------
+   Same differential equation, different words:
+       V = L di/dt + R i + (1/C) integral(i dt)
+       F = m dv/dt + b v +  k  integral(v dt)
+   so  i <-> v(elocity),  V <-> F,  L <-> m,  R <-> b,  1/C <-> k.
+   ========================================================================== */
+var TAB3 = {
+  label:'The mechanical twin', n:'3',
+  mount:function(){
+    document.getElementById('view').innerHTML =
+      '<div class="grid g-73">'+
+        '<div class="stack">'+
+          '<div class="panel"><h2 class="sec">The same equation, wearing different clothes</h2>'+
+          '<p class="lead">This is not a loose comparison. Write out the loop rule for the series LCR circuit and Newton’s second law '+
+          'for a mass on a spring with friction, and you get the <strong>same equation</strong>, symbol for symbol. '+
+          'Both pictures below are driven by the same sliders and run from the same solution.</p>'+
+          '<div class="svgbox" id="t3a"></div>'+
+          '<p class="note" id="t3narr" style="min-height:20px"></p></div>'+
+          '<div class="panel"><h2 class="sec">Reading the reactances off the mechanical picture</h2>'+
+          '<ul class="bul">'+
+            '<li><strong>The inductor is the mass.</strong> Shaking something heavy back and forth quickly is hard work, and it gets harder '+
+            'the faster you shake. That is X<sub>L</sub> = ωL rising with frequency. Push it slowly and the mass barely resists at all.</li>'+
+            '<li><strong>The capacitor is the spring.</strong> Push slowly and the spring simply takes up your push and holds you still: '+
+            'huge opposition. That is X<sub>C</sub> = 1/ωC blowing up as f falls, and at f = 0 the spring locks you solid, '+
+            'which is a capacitor blocking DC. Wiggle fast and the spring never has time to compress, so it hardly resists.</li>'+
+            '<li><strong>The resistor is the friction.</strong> It opposes the motion and it is the <em>only</em> part that takes energy out. '+
+            'The mass and the spring only borrow energy and give it back, which is exactly why reactances oppose current without getting warm.</li>'+
+            '<li><strong>Resonance is the playground swing.</strong> At one particular rate the spring hands its energy to the mass and the mass '+
+            'hands it back, cycle after cycle, so your pushing has nothing left to fight except the friction. The motion goes huge. '+
+            'In the circuit, Z drops all the way to R and the current peaks.</li>'+
+          '</ul></div>'+
+        '</div>'+
+        '<div class="stack">'+
+          '<div class="panel"><h3 class="sub3">Drive and components</h3>'+
+            slider('f','Frequency f&nbsp; / &nbsp;shaking rate')+
+            slider('L','Inductance L&nbsp; / &nbsp;mass m')+
+            slider('C','Capacitance C&nbsp; / &nbsp;<em>softness</em> of the spring')+
+            slider('R','Resistance R&nbsp; / &nbsp;friction b')+
+            '<div class="btnrow"><button class="btn prime" onclick="snapResonance()">Snap to resonance</button></div>'+
+            playbar()+
+          '</div>'+
+          '<div class="panel"><h3 class="sub3">Translation table</h3><div id="t3ro"></div></div>'+
+          '<div class="panel"><h3 class="sub3">Careful with the spring</h3>'+
+          '<p class="note">A <em>larger</em> capacitance is a <em>softer</em> spring, because the spring constant is k = 1/C. '+
+          'A big capacitor holds a lot of charge for little voltage, just as a soft spring stretches a long way for little force. '+
+          'This is the one place in the analogy where the slider runs the opposite way to your intuition, so it is worth pausing on.</p></div>'+
+        '</div>'+
+      '</div>';
+    this.onS();
+  },
+  onS:function(){
+    var m=model();
+    document.getElementById('t3ro').innerHTML='<table class="ro">'+
+      '<tr><td>current i</td><td>velocity v</td></tr>'+
+      '<tr><td>voltage V</td><td>force F</td></tr>'+
+      '<tr><td><span class="swatch" style="background:var(--cL)"></span>inductance L = '+eng(S.L,'H')+'</td><td>mass m</td></tr>'+
+      '<tr><td><span class="swatch" style="background:var(--cC)"></span>1/C = '+eng(1/S.C,'')+'</td><td>stiffness k</td></tr>'+
+      '<tr><td><span class="swatch" style="background:var(--cR)"></span>resistance R = '+eng(S.R,'Ω')+'</td><td>friction b</td></tr>'+
+      '<tr><td>X<sub>L</sub> = ωL</td><td>'+eng(m.XL,'Ω')+'</td></tr>'+
+      '<tr><td>X<sub>C</sub> = 1/ωC</td><td>'+eng(m.XC,'Ω')+'</td></tr>'+
+      '<tr class="hl"><td>Z = &radic;(R² + (X<sub>L</sub>−X<sub>C</sub>)²)</td><td>'+eng(m.Z,'Ω')+'</td></tr>'+
+      '<tr class="hl"><td>current I<sub>rms</sub></td><td>'+eng(m.Irms,'A')+'</td></tr>'+
+      row('resonant frequency f₀',eng(m.f0,'Hz'))+
+      '</table>';
+  },
+  frame:function(th){
+    var m=model(), W=900, H=430, s=svgOpen(W,H);
+    /* ---------- the circuit, compact, along the top ---------- */
+    var x0=70,x1=830,yT=44,yB=150;
+    var loop=rectPts(x0,yT,x1,yB), info=pathInfo(loop);
+    s+='<rect x="'+x0+'" y="'+yT+'" width="'+(x1-x0)+'" height="'+(yB-yT)+'" fill="none" stroke="'+P.axis+'" stroke-width="2"/>';
+    var amp=Math.min(40, 40*(m.Irms/(S.V/S.R)));
+    s+=currentDots(info,amp,th,P.I,46);
+    s+=symSource((x0+x1)/2,yT,Math.sin(th+m.phi));
+    s+=symResistor(x0+190,yB,Math.pow(Math.sin(th),2));
+    s+=symInductor((x0+x1)/2,yB,Math.abs(Math.sin(th)));
+    s+=symCapacitor(x1-190,yB,-Math.cos(th));
+    s+=txt(x0+190,yB+34,'R = '+eng(S.R,'Ω'),{size:10.5,anchor:'middle',fill:P.R,w:600});
+    s+=txt((x0+x1)/2,yB+34,'L = '+eng(S.L,'H'),{size:10.5,anchor:'middle',fill:P.L,w:600});
+    s+=txt(x1-190,yB+34,'C = '+eng(S.C,'F'),{size:10.5,anchor:'middle',fill:P.C,w:600});
+    s+=txt((x0+x1)/2,yT-14,eng(S.V,'V')+' r.m.s., '+eng(S.f,'Hz'),{size:10.5,anchor:'middle',fill:P.V,w:600});
+    s+=txt(x0,30,'THE CIRCUIT',{size:10,w:700,fill:P.muted});
+
+    /* ---------- the mechanical twin, along the bottom ---------- */
+    var yM=310, wallX=110, eqX=470;
+    /* amplitude of the displacement, scaled so that resonance just fills the frame */
+    var w0=2*Math.PI*m.f0, xref=(m.Vpk/S.R)/(w0||1), xnow=m.Ipk/m.w;
+    var A=90*Math.min(1, xnow/(xref||1));
+    var disp=A*(-Math.cos(th));
+    var mw=26+22*Math.log10(1+S.L*40), mh=104;   /* block size hints at the mass */
+    var bx=eqX+disp;
+    s+=txt(x0,216,'THE MECHANICAL TWIN',{size:10,w:700,fill:P.muted});
+    s+=line(wallX,yM-84,wallX,yM+84,P.axis,5);
+    for(var g=0;g<7;g++) s+=line(wallX,yM-84+g*28,wallX-12,yM-84+g*28+12,P.axis,1.5,null,0.7);
+    s+=line(wallX,yM+84,820,yM+84,P.axis,1.5,null,0.5);
+    /* spring: coil count grows with stiffness 1/C */
+    var coils=Math.round(5+7*(Math.log10(1/S.C)-3)/4), sy=yM-38;
+    coils=Math.max(4,Math.min(16,coils));
+    var sp='M '+wallX+' '+sy, x2s=bx-mw/2, seg=(x2s-wallX)/(coils*2+2);
+    sp+=' L '+(wallX+seg)+' '+sy;
+    for(var q=1;q<=coils*2;q++) sp+=' L '+(wallX+seg*(q+0.5))+' '+(sy+(q%2?-15:15));
+    sp+=' L '+(x2s-seg*0.5)+' '+sy+' L '+x2s+' '+sy;
+    s+='<path d="'+sp+'" fill="none" stroke="'+P.C+'" stroke-width="2.4" stroke-linejoin="round"/>';
+    s+=txt(wallX+40,sy-30,'spring, k = 1/C',{size:10,fill:P.C,w:600});
+    /* damper: cylinder plus piston, thickness grows with R */
+    var dy=yM+40, dth=6+10*Math.log10(1+S.R/12);
+    s+='<rect x="'+wallX+'" y="'+(dy-dth)+'" width="150" height="'+(2*dth)+'" rx="3" fill="none" stroke="'+P.R+'" stroke-width="2"/>';
+    s+=line(wallX+150,dy,bx-mw/2,dy,P.R,2.4);
+    var pistonX=Math.max(wallX+10,Math.min(wallX+142,wallX+70+disp*0.5));
+    s+=line(pistonX,dy-dth+2,pistonX,dy+dth-2,P.R,5);
+    s+=txt(wallX+8,dy+dth+16,'damper, b = R',{size:10,fill:P.R,w:600});
+    /* the mass */
+    s+='<rect x="'+(bx-mw/2)+'" y="'+(yM-mh/2)+'" width="'+mw+'" height="'+mh+'" rx="5" fill="'+P.L+'" opacity="0.85"/>';
+    s+=txt(bx,yM+1,'m',{size:15,anchor:'middle',fill:P.bg,w:700});
+    s+=txt(bx,yM+17,'= L',{size:10,anchor:'middle',fill:P.bg,w:700});
+    /* equilibrium marker */
+    s+=line(eqX,yM-mh/2-22,eqX,yM+mh/2+16,P.axis,1,'3,4',0.6);
+    /* the driving hand, force proportional to the supply voltage */
+    var F=Math.sin(th+m.phi)*74;
+    if(Math.abs(F)>3) s+=arrow(bx,yM-mh/2-30,bx+F,yM-mh/2-30,P.V,2.6,10);
+    s+=txt(bx,yM-mh/2-44,'driving force F ↔ voltage v',{size:10,anchor:'middle',fill:P.V,w:600});
+    /* velocity arrow */
+    var vv=Math.sin(th)*66;
+    if(Math.abs(vv)>3) s+=arrow(bx,yM+mh/2+24,bx+vv,yM+mh/2+24,P.I,2.6,10);
+    s+=txt(bx,yM+mh/2+46,'velocity v ↔ current i',{size:10,anchor:'middle',fill:P.I,w:600});
+    /* bars */
+    s+=barGauge(660,250,210,14,Math.sin(th),1,P.I,'velocity / current');
+    s+=barGauge(660,292,210,14,Math.sin(th+m.phi),1,P.V,'driving force / voltage');
+    s+=txt(660,340,'phase difference '+Math.abs(m.phiDeg).toFixed(1)+'°',{size:11,fill:P.bright,w:700});
+    s+=txt(660,357,Math.abs(m.phiDeg)<1?'in step: this is resonance':(m.phiDeg>0?'force leads: mass is winning':'force lags: spring is winning'),
+           {size:10,fill:Math.abs(m.phiDeg)<1?P.ok:P.muted});
+    s+='</svg>';
+    document.getElementById('t3a').innerHTML=s;
+    var d=Math.abs(m.phiDeg);
+    document.getElementById('t3narr').innerHTML =
+      d<2 ? '<strong>You are at resonance.</strong> Your pushing is perfectly in step with the motion, the spring and the mass are trading energy between themselves, and only the friction is left to fight. Circuit: Z = R and the current is at its maximum.'
+      : m.phiDeg>0 ? '<strong>Above resonance: the mass dominates.</strong> You are shaking faster than the system likes, so inertia fights you and the force leads the velocity. Circuit: X<sub>L</sub> &gt; X<sub>C</sub>, the supply voltage leads the current.'
+      : '<strong>Below resonance: the spring dominates.</strong> You are pushing too slowly, so the spring takes up your push and the force lags the velocity. Circuit: X<sub>C</sub> &gt; X<sub>L</sub>, the current leads the supply voltage.';
+  }
+};
+function snapResonance(){ var m=model(); if(isFinite(m.f0)) pushS('f',m.f0); }
+
+/* ---- impedance triangle: R across, X up or down, Z as the hypotenuse ---- */
+function impedanceTriangle(W,H,m){
+  var s=svgOpen(W,H), ox=62, oy=H-76, maxH=W-130, maxV=H-150;
+  var vext=Math.max(m.XL,m.XC,Math.abs(m.X),1e-9);
+  var sc=Math.min(maxH/Math.max(m.R,1e-9), maxV/vext);
+  if(!isFinite(sc)||sc<=0) sc=1;
+  var rx=ox+m.R*sc, zy=oy-m.X*sc;
+  s+=line(ox-14,oy,W-24,oy,P.grid,1);
+  s+=line(ox,oy-maxV-8,ox,oy+maxV*0.6,P.grid,1);
+  /* R */
+  s+=arrow(ox,oy,rx,oy,P.R,3,10);
+  s+=txt((ox+rx)/2,oy+18,'R = '+eng(m.R,'Ω'),{size:10.5,anchor:'middle',fill:P.R,w:700});
+  /* XL up from the tip of R, then XC back down */
+  var yl=oy-m.XL*sc;
+  if(m.hasL&&m.XL>0){ s+=arrow(rx,oy,rx,yl,P.L,2.4,9);
+    s+=txt(rx+8,(oy+yl)/2,subs('X','L',' = '+eng(m.XL,'Ω')),{size:10.5,fill:P.L,w:700,raw:true}); }
+  if(m.hasC&&m.XC>0){ s+=arrow(rx,yl,rx,yl+m.XC*sc,P.C,2.4,9);
+    s+=txt(rx+8,(yl+zy)/2+4,subs('X','C',' = '+eng(m.XC,'Ω')),{size:10.5,fill:P.C,w:700,raw:true}); }
+  /* Z */
+  s+=line(rx,zy,rx,oy,P.axis,1,'3,3',0.8);
+  s+=arrow(ox,oy,rx,zy,P.accent,3,11);
+  s+=txt((ox+rx)/2-6,(oy+zy)/2-9,'Z = '+eng(m.Z,'Ω'),{size:11.5,anchor:'middle',fill:P.accent,w:700});
+  /* the angle */
+  var rad=Math.min(48,Math.max(m.R*sc*0.55,18)), sgn=m.X>=0?-1:1;
+  s+='<path d="M '+(ox+rad)+' '+oy+' A '+rad+' '+rad+' 0 0 '+(m.X>=0?0:1)+' '+
+     (ox+rad*Math.cos(m.phi))+' '+(oy-rad*Math.sin(m.phi))+'" fill="none" stroke="'+P.accent+'" stroke-width="1.4"/>';
+  s+=txt(ox+rad+8,oy+sgn*12,'φ = '+m.phiDeg.toFixed(1)+'°',{size:11,fill:P.accent,w:700});
+  s+=txt(14,20,'Impedance triangle',{size:11,fill:P.text,w:700});
+  s+=txt(14,36,subs('X','L','')+' and '+subs('X','C','')+' point opposite ways, so they cancel before Pythagoras is applied',{size:9.5,fill:P.muted,raw:true});
+  s+=txt(W-14,H-14,m.X>0?'inductive: voltage leads current':(m.X<0?'capacitive: current leads voltage':'resonance: in phase'),
+         {size:10,anchor:'end',fill:Math.abs(m.X)<1e-9?P.ok:P.muted,w:600});
+  s+='</svg>';
+  return s;
+}
+
+/* ==========================================================================
+   TAB 4  |  the LCR bench
+   ========================================================================== */
+var T4 = { hasL:true, hasC:true, show:{v:true,vR:true,vL:true,vC:true} };
+var TAB4 = {
+  label:'The LCR bench', n:'4',
+  mount:function(){
+    document.getElementById('view').innerHTML =
+      '<div class="panel" style="margin-bottom:14px"><h2 class="sec">Series LCR circuit</h2>'+
+      '<p class="lead">One loop, so <strong>the same current flows through all three components at every instant</strong>. That is why the '+
+      'current is used as the reference: it is the one thing they share. Their voltages, however, peak at different times, '+
+      'which is the whole reason you cannot simply add R, X<sub>L</sub> and X<sub>C</sub> as plain numbers.</p>'+
+      '<div class="svgbox" id="t4circ"></div></div>'+
+      '<div class="grid g-73">'+
+        '<div class="stack">'+
+          '<div class="panel"><h3 class="sub3">Waveforms</h3>'+
+          '<div class="chkrow">'+
+            chk('v','supply v')+chk('vR','v across R')+chk('vL','v across L')+chk('vC','v across C')+
+          '</div><div class="svgbox" id="t4wave" style="margin-top:8px"></div>'+
+          '<p class="note" id="t4kirch"></p></div>'+
+          '<div class="panel"><h3 class="sub3">Why the voltages do not just add up</h3>'+
+          '<p class="lead">At any instant they <em>do</em> add up: v<sub>R</sub> + v<sub>L</sub> + v<sub>C</sub> = v, exactly, and the line under '+
+          'the graph checks it live. What does not add up is the <strong>peak</strong> values, because the three peaks happen at different moments. '+
+          'V<sub>L</sub> and V<sub>C</sub> are a full 180° apart, so they partly cancel each other; whatever survives is 90° away from '+
+          'V<sub>R</sub>, and a right angle is what brings in Pythagoras:</p>'+
+          '<div class="key">V<sub>supply</sub> = &radic;( V<sub>R</sub>² + (V<sub>L</sub> − V<sub>C</sub>)² ) '+
+          '&nbsp;&nbsp;and dividing through by the shared current,&nbsp;&nbsp; '+
+          '<b>Z = &radic;( R² + (X<sub>L</sub> − X<sub>C</sub>)² )</b></div>'+
+          '<p class="note">Notice that <strong>V<sub>L</sub> and V<sub>C</sub> can each be larger than the supply voltage</strong> without breaking '+
+          'anything, because at the moment one of them is large the other is large in the opposite direction. Near resonance this becomes dramatic. '+
+          'Turn the frequency to f₀ and watch them.</p></div>'+
+        '</div>'+
+        '<div class="stack">'+
+          '<div class="panel"><h3 class="sub3">Controls</h3>'+
+            slider('V','Supply voltage (r.m.s.)')+slider('f','Frequency f')+slider('R','Resistance R')+
+            slider('L','Inductance L')+slider('C','Capacitance C')+
+            '<div class="chkrow" style="margin:10px 0 6px">'+
+              '<label><input type="checkbox" '+(T4.hasL?'checked':'')+' onchange="T4.hasL=this.checked;TABS[cur].mount()"> include the inductor</label>'+
+              '<label><input type="checkbox" '+(T4.hasC?'checked':'')+' onchange="T4.hasC=this.checked;TABS[cur].mount()"> include the capacitor</label>'+
+            '</div>'+
+            '<div class="btnrow"><button class="btn prime" onclick="snapResonance()">Snap to resonance</button></div>'+
+            playbar()+
+          '</div>'+
+          '<div class="panel"><h3 class="sub3">Phasor diagram</h3>'+
+          '<div class="svgbox" id="t4ph"></div>'+
+          '<p class="note">The thin dashed path is the phasor addition: start along V<sub>R</sub>, add V<sub>L</sub> upwards, '+
+          'add V<sub>C</sub> downwards, and you land exactly on the tip of the supply phasor.</p></div>'+
+          '<div class="panel"><h3 class="sub3">Numbers</h3><div id="t4ro"></div></div>'+
+          '<div class="panel"><div class="svgbox" id="t4tri"></div></div>'+
+        '</div>'+
+      '</div>';
+    this.onS();
+  },
+  onS:function(){
+    var m=model({hasL:T4.hasL,hasC:T4.hasC});
+    document.getElementById('t4ro').innerHTML='<table class="ro">'+
+      row('ω = 2πf',eng(m.w,'rad s⁻¹'))+
+      (T4.hasL?row('<span class="swatch" style="background:var(--cL)"></span>X<sub>L</sub> = ωL',eng(m.XL,'Ω')):'')+
+      (T4.hasC?row('<span class="swatch" style="background:var(--cC)"></span>X<sub>C</sub> = 1/ωC',eng(m.XC,'Ω')):'')+
+      row('net reactance X<sub>L</sub>−X<sub>C</sub>',eng(m.X,'Ω'))+
+      '<tr class="hl"><td>impedance Z</td><td>'+eng(m.Z,'Ω')+'</td></tr>'+
+      '<tr class="hl"><td>current I<sub>rms</sub> = V/Z</td><td>'+eng(m.Irms,'A')+'</td></tr>'+
+      row('phase angle φ',m.phiDeg.toFixed(1)+'°')+
+      row('which leads',Math.abs(m.phiDeg)<0.05?'neither, in phase':(m.phiDeg>0?'voltage leads current':'current leads voltage'))+
+      '<tr><td colspan="2" style="padding-top:9px;color:var(--muted);font-size:11px">r.m.s. voltage across each part</td></tr>'+
+      row('<span class="swatch" style="background:var(--cR)"></span>V<sub>R</sub> = IR',eng(m.VR,'V'))+
+      (T4.hasL?row('<span class="swatch" style="background:var(--cL)"></span>V<sub>L</sub> = IX<sub>L</sub>',eng(m.VL,'V')):'')+
+      (T4.hasC?row('<span class="swatch" style="background:var(--cC)"></span>V<sub>C</sub> = IX<sub>C</sub>',eng(m.VC,'V')):'')+
+      row('&radic;(V<sub>R</sub>²+(V<sub>L</sub>−V<sub>C</sub>)²)',eng(Math.sqrt(m.VR*m.VR+Math.pow(m.VL-m.VC,2)),'V')+' &nbsp;= supply')+
+      row('power dissipated (R only)',eng(m.P,'W'))+
+      (T4.hasL&&T4.hasC?'<tr class="hl"><td>resonant frequency f₀</td><td>'+eng(m.f0,'Hz')+'</td></tr>':'')+
+      '</table>';
+    document.getElementById('t4tri').innerHTML=impedanceTriangle(430,300,m);
+  },
+  frame:function(th){
+    var m=model({hasL:T4.hasL,hasC:T4.hasC});
+    /* ---------- circuit ---------- */
+    var W=1180,H=276, s=svgOpen(W,H);
+    var x0=80,x1=W-80,yT=62,yB=188;
+    var info=pathInfo(rectPts(x0,yT,x1,yB));
+    s+='<rect x="'+x0+'" y="'+yT+'" width="'+(x1-x0)+'" height="'+(yB-yT)+'" fill="none" stroke="'+P.axis+'" stroke-width="2"/>';
+    var iref=S.V/S.R;
+    s+=currentDots(info,Math.min(46,46*(m.Irms/iref)),th,P.I,54);
+    s+=symSource((x0+x1)/2,yT,Math.sin(th+m.phi));
+    s+=txt((x0+x1)/2,yT-30,eng(S.V,'V')+' r.m.s.  ·  '+eng(S.f,'Hz')+'  ·  peak '+eng(m.Vpk,'V'),
+           {size:11.5,anchor:'middle',fill:P.V,w:700});
+    s+=txt((x0+x1)/2,yT-14,'v = '+eng(m.Vpk*Math.sin(th+m.phi),'V',3)+' right now',{size:10,anchor:'middle',fill:P.muted,mono:true});
+    var parts=[{k:'R',on:true},{k:'L',on:T4.hasL},{k:'C',on:T4.hasC}].filter(function(p){return p.on});
+    parts.forEach(function(p,ix){
+      var cx=x0+(x1-x0)*(ix+1)/(parts.length+1);
+      if(p.k==='R'){ s+=symResistor(cx,yB,Math.pow(Math.sin(th),2));
+        s+=txt(cx,yB+34,'R = '+eng(S.R,'Ω'),{size:11,anchor:'middle',fill:P.R,w:700});
+        s+=txt(cx,yB+50,'Vᵣₘₛ = '+eng(m.VR,'V'),{size:10,anchor:'middle',fill:P.muted,mono:true});
+        s+=txt(cx,yB-42,'v = '+eng(m.VRpk*Math.sin(th),'V',3),{size:10,anchor:'middle',fill:P.R,mono:true}); }
+      if(p.k==='L'){ s+=symInductor(cx,yB,Math.abs(Math.sin(th)));
+        s+=txt(cx,yB+34,'L = '+eng(S.L,'H'),{size:11,anchor:'middle',fill:P.L,w:700});
+        s+=txt(cx,yB+50,subs('X','L',' = '+eng(m.XL,'Ω')+',  Vᵣₘₛ = '+eng(m.VL,'V')),{size:10,anchor:'middle',fill:P.muted,raw:true});
+        s+=txt(cx,yB-46,'v = '+eng(m.VLpk*Math.cos(th),'V',3),{size:10,anchor:'middle',fill:P.L,mono:true}); }
+      if(p.k==='C'){ s+=symCapacitor(cx,yB,-Math.cos(th));
+        s+=txt(cx,yB+34,'C = '+eng(S.C,'F'),{size:11,anchor:'middle',fill:P.C,w:700});
+        s+=txt(cx,yB+50,subs('X','C',' = '+eng(m.XC,'Ω')+',  Vᵣₘₛ = '+eng(m.VC,'V')),{size:10,anchor:'middle',fill:P.muted,raw:true});
+        s+=txt(cx,yB-46,'v = '+eng(-m.VCpk*Math.cos(th),'V',3),{size:10,anchor:'middle',fill:P.C,mono:true}); }
+    });
+    s+=txt(x0,yT-30,'i = '+eng(m.Ipk*Math.sin(th),'A',3)+' right now',{size:10.5,fill:P.I,mono:true,w:600});
+    s+=txt(x0,yT-14,'Iᵣₘₛ = '+eng(m.Irms,'A')+', the same everywhere in the loop',{size:10,fill:P.muted});
+    s+=txt(x1,H-8,'the dots move at the speed of the instantaneous current',{size:9.5,anchor:'end',op:0.7});
+    s+='</svg>';
+    document.getElementById('t4circ').innerHTML=s;
+
+    /* ---------- waveforms ---------- */
+    var WW=720,WH=440, s2=svgOpen(WW,WH);
+    var tr=[];
+    if(T4.show.vR) tr.push({label:subs('v','R',''),color:P.R,amp:m.VRpk,phase:0});
+    if(T4.show.vL&&T4.hasL) tr.push({label:subs('v','L',''),color:P.L,amp:m.VLpk,phase:Math.PI/2});
+    if(T4.show.vC&&T4.hasC) tr.push({label:subs('v','C',''),color:P.C,amp:m.VCpk,phase:-Math.PI/2});
+    if(T4.show.v) tr.push({label:'v',color:P.V,amp:m.Vpk,phase:m.phi,width:2.6});
+    var vmax=Math.max(m.Vpk,m.VRpk,T4.hasL?m.VLpk:0,T4.hasC?m.VCpk:0,1e-9);
+    s2+=txt(14,20,'voltages, all on one scale  (peak shown: '+eng(vmax,'V')+')',{size:10.5,fill:P.text,w:600});
+    if(tr.length) s2+=wavePanel(52,32,640,220,{traces:tr,scale:vmax,th:th,T:m.T,noX:true});
+    s2+=txt(14,270,'current',{size:10.5,fill:P.I,w:700});
+    s2+=wavePanel(52,282,640,120,{traces:[{label:'i',color:P.I,amp:m.Ipk,phase:0,width:2.6}],scale:m.Ipk,th:th,T:m.T});
+    s2+=txt(46,286,eng(m.Ipk,'A'),{size:9,anchor:'end',mono:true});
+    s2+=txt(46,404,'−'+eng(m.Ipk,'A'),{size:9,anchor:'end',mono:true});
+    s2+=txt(46,36,eng(vmax,'V'),{size:9,anchor:'end',mono:true});
+    s2+=txt(46,250,'−'+eng(vmax,'V'),{size:9,anchor:'end',mono:true});
+    s2+=txt(WW-10,WH-6,'one period T = '+eng(m.T,'s')+'; the vertical cursor is the phasor angle',{size:9.5,anchor:'end',op:0.75});
+    s2+='</svg>';
+    document.getElementById('t4wave').innerHTML=s2;
+
+    /* live Kirchhoff check at the cursor */
+    var vR=m.VRpk*Math.sin(th), vL=T4.hasL?m.VLpk*Math.cos(th):0, vC=T4.hasC?-m.VCpk*Math.cos(th):0;
+    document.getElementById('t4kirch').innerHTML =
+      '<span class="mono">v<sub>R</sub> '+fmtSigned(vR)+' &nbsp;+&nbsp; v<sub>L</sub> '+fmtSigned(vL)+
+      ' &nbsp;+&nbsp; v<sub>C</sub> '+fmtSigned(vC)+' &nbsp;=&nbsp; <b style="color:var(--ok)">'+fmtSigned(vR+vL+vC)+
+      ' V</b> &nbsp;&nbsp;and the supply is <b style="color:var(--ok)">'+fmtSigned(m.Vpk*Math.sin(th+m.phi))+' V</b></span>'+
+      '<br>Kirchhoff holds at every instant, whatever the frequency.';
+
+    /* ---------- phasors ---------- */
+    var PW=430,PH=400, s3=svgOpen(PW,PH), cx=PW/2, cy=190, r=132;
+    var items=[{label:subs('V','R',''),color:P.R,mag:m.VRpk/vmax,phase:0}];
+    if(T4.hasL) items.push({label:subs('V','L',''),color:P.L,mag:m.VLpk/vmax,phase:Math.PI/2});
+    if(T4.hasC) items.push({label:subs('V','C',''),color:P.C,mag:m.VCpk/vmax,phase:-Math.PI/2});
+    items.push({label:'V',color:P.V,mag:m.Vpk/vmax,phase:m.phi});
+    items.push({label:'I',color:P.I,mag:0.94,phase:0,dash:'6,4'});
+    /* the addition path, drawn first so the arrows sit on top of it:
+       VR, then VL up, then VC down, landing exactly on the tip of V         */
+    var pt=[cx,cy], pathSegs=[[m.VRpk/vmax,0,P.R]];
+    if(T4.hasL) pathSegs.push([m.VLpk/vmax,Math.PI/2,P.L]);
+    if(T4.hasC) pathSegs.push([m.VCpk/vmax,-Math.PI/2,P.C]);
+    pathSegs.forEach(function(sg){
+      var a=th+sg[1], nx=pt[0]+r*sg[0]*Math.cos(a), ny=pt[1]-r*sg[0]*Math.sin(a);
+      s3+=line(pt[0],pt[1],nx,ny,sg[2],1.1,'4,4',0.5); pt=[nx,ny];
+    });
+    s3+=phasorPanel(cx,cy,r,items,th,{});
+    s3+=circ(pt[0].toFixed(1),pt[1].toFixed(1),3.5,P.V);
+    s3+=txt(14,20,'rotating anticlockwise; height above the axis is the instantaneous value',{size:9.5,fill:P.muted});
+    s3+=txt(14,PH-8,'voltages share one scale; the dashed green current phasor has its own',{size:9,fill:P.muted,op:0.8});
+    s3+=txt(cx,PH-40,'φ = '+m.phiDeg.toFixed(1)+'° between V and I',{size:11.5,anchor:'middle',fill:P.bright,w:700});
+    s3+=txt(cx,PH-22,Math.abs(m.phiDeg)<0.05?'in phase, this is resonance':(m.phiDeg>0?'V leads I (inductive)':'I leads V (capacitive)'),
+            {size:10.5,anchor:'middle',fill:Math.abs(m.phiDeg)<0.05?P.ok:P.muted});
+    s3+='</svg>';
+    document.getElementById('t4ph').innerHTML=s3;
+  }
+};
+function chk(k,lab){
+  return '<label><input type="checkbox" '+(T4.show[k]?'checked':'')+
+    ' onchange="T4.show[\''+k+'\']=this.checked"> '+lab+'</label>';
+}
+function fmtSigned(x){ return (x>=0?'+':'−')+sig(Math.abs(x),3); }
+
+/* ==========================================================================
+   TAB 5  |  resonance
+   ========================================================================== */
+var T5 = { sweep:false, last:0, dir:1, sp:0 };
+var TAB5 = {
+  label:'Resonance', n:'5',
+  mount:function(){
+    document.getElementById('view').innerHTML =
+      '<div class="grid g-73">'+
+        '<div class="stack">'+
+          '<div class="panel"><h2 class="sec">Current against frequency</h2>'+
+          '<p class="lead">Everything else held fixed, sweep the frequency and watch the current. There is exactly one frequency at which '+
+          'X<sub>L</sub> and X<sub>C</sub> are equal. There the net reactance is zero, the impedance collapses to <strong>Z = R</strong>, '+
+          'and the current is as large as this circuit can manage. The faint curves show the same circuit with a third of the resistance '+
+          'and with three times the resistance.</p>'+
+          '<div class="svgbox" id="t5a"></div></div>'+
+          '<div class="panel"><h2 class="sec">The two reactances, and the phase</h2>'+
+          '<div class="grid g-11">'+
+            '<div><div class="svgbox" id="t5b"></div>'+
+            '<p class="note">X<sub>L</sub> climbs with frequency, X<sub>C</sub> falls. They cross once, and that crossing is f₀.</p></div>'+
+            '<div><div class="svgbox" id="t5c"></div>'+
+            '<p class="note">Below f₀ the capacitor wins and the current leads. Above f₀ the inductor wins and the current lags. '+
+            'Right at f₀ the phase difference passes through zero.</p></div>'+
+          '</div></div>'+
+          '<div class="panel"><h2 class="sec">Deriving f<sub>0</sub>, the way the exam wants it</h2>'+
+          '<p class="lead">From the phasor diagram, the current is greatest when Z is smallest, and Z = &radic;(R² + (X<sub>L</sub>−X<sub>C</sub>)²) '+
+          'is smallest when the bracket is zero. So set V<sub>L</sub> = V<sub>C</sub>, equivalently X<sub>L</sub> = X<sub>C</sub>:</p>'+
+          '<div class="key" style="line-height:2.1">ωL = 1/ωC &nbsp;&nbsp;→&nbsp;&nbsp; ω² = 1/LC &nbsp;&nbsp;→&nbsp;&nbsp; '+
+          'ω₀ = 1/&radic;(LC) &nbsp;&nbsp;→&nbsp;&nbsp; <b>f₀ = 1 / (2π&radic;(LC))</b></div>'+
+          '<p class="note">Note what is <strong>not</strong> in that formula: R. Resistance does not move the resonant frequency at all. '+
+          'It only controls how <em>sharp</em> the peak is and how tall it gets. A small R gives a tall narrow spike, which is how a radio '+
+          'picks out one station and rejects its neighbours.</p></div>'+
+        '</div>'+
+        '<div class="stack">'+
+          '<div class="panel"><h3 class="sub3">Controls</h3>'+
+            slider('V','Supply voltage (r.m.s.)')+slider('f','Frequency f')+slider('R','Resistance R')+
+            slider('L','Inductance L')+slider('C','Capacitance C')+
+            '<div class="btnrow">'+
+              '<button class="btn prime" onclick="snapResonance()">Snap to resonance</button>'+
+              '<button class="btn" id="sweepbtn" onclick="T5.sweep=!T5.sweep;this.classList.toggle(\'active\')">Auto sweep</button>'+
+            '</div></div>'+
+          '<div class="panel"><h3 class="sub3">Where you are now</h3><div id="t5ro"></div></div>'+
+          '<div class="panel"><h3 class="sub3">The voltage surprise</h3>'+
+          '<p class="note" id="t5q"></p>'+
+          '<p class="note">At resonance the inductor and capacitor voltages are equal and exactly opposite, so as far as the supply is concerned '+
+          'they cancel to nothing. But each one on its own is still there, and a voltmeter across the inductor will read '+
+          '<strong>Q times the supply voltage</strong>, where Q = X<sub>L</sub>/R at resonance. This is real, and with a small R it can be '+
+          'large enough to matter.</p></div>'+
+          '<div class="panel"><h3 class="sub3">Energy at resonance</h3>'+
+          '<p class="note">Each quarter cycle the capacitor’s electric field empties into the inductor’s magnetic field, then back again. '+
+          'The supply is not being asked to provide that energy, only to top up what the resistor turns into heat. '+
+          'That is why the supply current can be so large while the supply does so little work: it is pushing a system that is already sloshing.</p></div>'+
+        '</div>'+
+      '</div>';
+    this.onS();
+  },
+  onS:function(){
+    var m=model(), Q=m.R>0?m.XL/m.R:Infinity, Q0=(1/m.R)*Math.sqrt(m.L/m.C);
+    var off=m.f/m.f0;
+    document.getElementById('t5ro').innerHTML='<table class="ro">'+
+      row('frequency f',eng(m.f,'Hz'))+
+      '<tr class="hl"><td>resonant frequency f₀</td><td>'+eng(m.f0,'Hz')+'</td></tr>'+
+      row('X<sub>L</sub>',eng(m.XL,'Ω'))+row('X<sub>C</sub>',eng(m.XC,'Ω'))+
+      row('Z',eng(m.Z,'Ω'))+
+      '<tr class="hl"><td>I<sub>rms</sub></td><td>'+eng(m.Irms,'A')+'</td></tr>'+
+      row('I at resonance would be',eng(m.V/m.R,'A'))+
+      row('phase φ',m.phiDeg.toFixed(1)+'°')+
+      row('state',Math.abs(off-1)<0.005?'<b style="color:var(--ok)">at resonance</b>':(off<1?'below f₀, capacitive':'above f₀, inductive'))+
+      row('V<sub>L</sub>',eng(m.VL,'V'))+row('V<sub>C</sub>',eng(m.VC,'V'))+
+      row('sharpness Q = (1/R)&radic;(L/C)',sig(Q0,3))+
+      '</table>';
+    document.getElementById('t5q').innerHTML =
+      'With these values Q = <strong>'+sig(Q0,3)+'</strong>, so at resonance the voltage across the inductor would be about '+
+      '<strong>'+eng(Q0*m.V,'V')+'</strong> while the supply is only '+eng(m.V,'V')+'. '+
+      (Q0>1.5?'Both V<sub>L</sub> and V<sub>C</sub> are larger than the supply, and they are cancelling each other.':
+              'With this much resistance the peak is broad and there is no dramatic overshoot.');
+  },
+  frame:function(th){
+    var now=performance.now();
+    if(T5.sweep){
+      var dt=Math.min(0.05,(now-(T5.last||now))/1000);
+      var lo=Math.log(LIM.f.min), hi=Math.log(LIM.f.max);
+      T5.sp=(T5.sp||((Math.log(S.f)-lo)/(hi-lo)))+T5.dir*dt*0.14;
+      if(T5.sp>1){T5.sp=1;T5.dir=-1} if(T5.sp<0){T5.sp=0;T5.dir=1}
+      pushS('f',Math.exp(lo+(hi-lo)*T5.sp));
+    }
+    T5.last=now;
+    var m=model();
+    /* ---- I against f ---- */
+    var W=860,H=350, s=svgOpen(W,H), px=66,py=34,pw=W-110,ph=H-96;
+    var lo2=Math.log10(LIM.f.min), hi2=Math.log10(LIM.f.max);
+    var Xf=function(f){return px+pw*(Math.log10(f)-lo2)/(hi2-lo2);};
+    var imax=S.V/Math.max(S.R/3,1e-9);
+    var Yi=function(v){return py+ph-ph*Math.min(v,imax)/imax;};
+    s+='<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="none" stroke="'+P.grid+'"/>';
+    for(var d=Math.ceil(lo2);d<=Math.floor(hi2);d++){
+      var xx=Xf(Math.pow(10,d));
+      s+=line(xx,py,xx,py+ph,P.grid,1);
+      s+=txt(xx,py+ph+16,eng(Math.pow(10,d),'Hz',1),{size:9.5,anchor:'middle',mono:true});
+      for(var k=2;k<10;k++){ var xm=Xf(Math.pow(10,d)*k); if(xm<px||xm>px+pw)continue;
+        s+=line(xm,py,xm,py+ph,P.grid,1,null,0.4); }
+    }
+    s+=line(px,py+ph,px+pw,py+ph,P.axis,1.2)+line(px,py,px,py+ph,P.axis,1.2);
+    s+=txt(px+pw,py+ph+32,'frequency (log scale)',{size:10.5,anchor:'end'});
+    s+=txt(px-6,py+8,eng(imax,'A',2),{size:9.5,anchor:'end',mono:true});
+    s+=txt(px-6,py+ph,'0',{size:9.5,anchor:'end',mono:true});
+    s+=txt(px,py-10,'Iᵣₘₛ',{size:11,fill:P.I,w:700});
+    function icurve(Rv,col,wd,op){
+      var pts=[];
+      for(var i=0;i<=400;i++){
+        var f=Math.pow(10,lo2+(hi2-lo2)*i/400), w=2*Math.PI*f;
+        var Z=Math.sqrt(Rv*Rv+Math.pow(w*S.L-1/(w*S.C),2));
+        pts.push([Xf(f),Yi(S.V/Z)]);
+      }
+      return poly(pts,col,wd,null,op);
+    }
+    s+=icurve(S.R*3,P.muted,1.4,0.45)+icurve(S.R/3,P.muted,1.4,0.45);
+    s+=icurve(S.R,P.I,2.8);
+    s+=txt(Xf(m.f0)+6,py+16,'R/3',{size:9.5,fill:P.muted});
+    s+=txt(Xf(m.f0)+6,Yi(S.V/(S.R*3))-8,'3R',{size:9.5,fill:P.muted});
+    /* resonance marker and the live point */
+    if(m.f0>LIM.f.min&&m.f0<LIM.f.max){
+      s+=line(Xf(m.f0),py,Xf(m.f0),py+ph,P.ok,1.5,'5,3',0.9);
+      s+=txt(Xf(m.f0),py-10,'f₀ = '+eng(m.f0,'Hz'),{size:10.5,anchor:'middle',fill:P.ok,w:700,mono:true});
+    }
+    s+=line(Xf(m.f),py,Xf(m.f),py+ph,P.accent,1.5,'4,3');
+    s+=circ(Xf(m.f).toFixed(1),Yi(m.Irms).toFixed(1),5,P.accent);
+    s+=txt(Xf(m.f)+(m.f>m.f0?-8:8),Yi(m.Irms)-12,eng(m.Irms,'A'),
+           {size:10.5,fill:P.accent,w:700,mono:true,anchor:m.f>m.f0?'end':'start'});
+    /* a little phasor to show the phase at this point */
+    s+=phasorPanel(W-78,py+58,44,[{label:'',color:P.V,mag:1,phase:m.phi},{label:'',color:P.I,mag:0.8,phase:0,dash:'4,3'}],th,{spin:false});
+    s+=txt(W-78,py+118,m.phiDeg.toFixed(0)+'°',{size:10.5,anchor:'middle',fill:P.bright,w:700,mono:true});
+    s+='</svg>';
+    document.getElementById('t5a').innerHTML=s;
+
+    /* ---- reactances ---- */
+    var s2=svgOpen(430,280); s2+=reactancePanel(50,26,340,200,'both'); s2+='</svg>';
+    document.getElementById('t5b').innerHTML=s2;
+
+    /* ---- phase against frequency ---- */
+    var s3=svgOpen(430,280), qx=56,qy=30,qw=336,qh=196;
+    var Yp=function(p){return qy+qh/2-(qh/2-6)*p/90;};
+    s3+='<rect x="'+qx+'" y="'+qy+'" width="'+qw+'" height="'+qh+'" fill="none" stroke="'+P.grid+'"/>';
+    s3+=line(qx,Yp(0),qx+qw,Yp(0),P.axis,1.2);
+    [90,45,-45,-90].forEach(function(p){ s3+=line(qx,Yp(p),qx+qw,Yp(p),P.grid,1,'3,4');
+      s3+=txt(qx-6,Yp(p)+4,(p>0?'+':'')+p+'°',{size:9.5,anchor:'end',mono:true}); });
+    s3+=txt(qx-6,Yp(0)+4,'0°',{size:9.5,anchor:'end',mono:true});
+    var Xq=function(f){return qx+qw*(Math.log10(f)-lo2)/(hi2-lo2);}, pts3=[];
+    for(var i3=0;i3<=400;i3++){
+      var f3=Math.pow(10,lo2+(hi2-lo2)*i3/400), w3=2*Math.PI*f3;
+      pts3.push([Xq(f3),Yp(Math.atan2(w3*S.L-1/(w3*S.C),S.R)*DEG)]);
+    }
+    s3+=poly(pts3,P.accent,2.4);
+    if(m.f0>LIM.f.min&&m.f0<LIM.f.max) s3+=line(Xq(m.f0),qy,Xq(m.f0),qy+qh,P.ok,1.4,'5,3',0.9);
+    s3+=circ(Xq(m.f).toFixed(1),Yp(m.phiDeg).toFixed(1),4.5,P.accent);
+    s3+=txt(qx,qy-10,'phase angle φ (voltage relative to current)',{size:10,fill:P.text,w:600});
+    s3+=txt(qx+qw,qy+qh+16,'frequency (log scale)',{size:10,anchor:'end'});
+    s3+=txt(qx+6,Yp(70),'inductive, V leads',{size:9.5,fill:P.L});
+    s3+=txt(qx+6,Yp(-78),'capacitive, I leads',{size:9.5,fill:P.C});
+    s3+='</svg>';
+    document.getElementById('t5c').innerHTML=s3;
+    if(!T5.sweep) return;
+    this.onS();
+  }
+};
+
+/* ==========================================================================
+   TAB 6  |  check yourself
+   ========================================================================== */
+var T6 = { qs:[], st:[] };
+function rnd(a,b,step){ step=step||1; var n=Math.round((a+Math.random()*(b-a))/step)*step; return +n.toFixed(6); }
+function genQuestions(){
+  var f1=rnd(50,400,10), L1=rnd(20,300,10);                       /* mH */
+  var XL1=2*Math.PI*f1*L1/1000;
+  var f2=rnd(50,400,10), C2=rnd(2,60,1);                          /* uF */
+  var XC2=1/(2*Math.PI*f2*C2*1e-6);
+  var R3=rnd(20,200,5), f3=rnd(50,200,10), L3=rnd(50,400,10), V3=rnd(6,24,1);
+  var XL3=2*Math.PI*f3*L3/1000, Z3=Math.hypot(R3,XL3), ph3=Math.atan2(XL3,R3)*DEG;
+  var L4=rnd(20,500,10), C4=rnd(1,40,1);                          /* mH, uF */
+  var f04=1/(2*Math.PI*Math.sqrt(L4/1000*C4*1e-6));
+  var XLq=rnd(90,150,1), XCq=rnd(10,50,1);
+  return [
+  {type:'num',
+   text:'A '+f1+' Hz supply is connected to an inductor of inductance '+L1+' mH. Calculate the reactance of the inductor.',
+   ans:XL1, unit:'Ω',
+   sol:'<span class="step">ω = 2πf = 2π × '+f1+' = '+sig(2*Math.PI*f1,4)+' rad s⁻¹</span>'+
+       '<span class="step">X<sub>L</sub> = ωL = '+sig(2*Math.PI*f1,4)+' × '+(L1/1000)+' = '+sig(XL1,3)+' Ω</span>'+
+       'Watch the millihenries. L must go into the formula in henries.'},
+  {type:'num',
+   text:'Calculate the reactance of a '+C2+' µF capacitor at a frequency of '+f2+' Hz.',
+   ans:XC2, unit:'Ω',
+   sol:'<span class="step">ω = 2π × '+f2+' = '+sig(2*Math.PI*f2,4)+' rad s⁻¹</span>'+
+       '<span class="step">X<sub>C</sub> = 1/ωC = 1 / ('+sig(2*Math.PI*f2,4)+' × '+C2+'×10⁻⁶) = '+sig(XC2,3)+' Ω</span>'+
+       'Halve the frequency and this reactance doubles. Take the frequency to zero and it becomes infinite, which is a capacitor blocking DC.'},
+  {type:'num',
+   text:'A '+R3+' Ω resistor is connected in series with a '+L3+' mH inductor across a '+V3+' V<sub>rms</sub>, '+f3+' Hz supply. '+
+        'Calculate the total impedance of the circuit.',
+   ans:Z3, unit:'Ω',
+   sol:'<span class="step">X<sub>L</sub> = 2πfL = 2π × '+f3+' × '+(L3/1000)+' = '+sig(XL3,3)+' Ω</span>'+
+       '<span class="step">Z = &radic;(R² + X<sub>L</sub>²) = &radic;('+R3+'² + '+sig(XL3,3)+'²) = '+sig(Z3,3)+' Ω</span>'+
+       'There is no capacitor, so X<sub>C</sub> = 0 and the bracket is just X<sub>L</sub>. Never add R and X<sub>L</sub> directly: they are 90° apart.'},
+  {type:'num',
+   text:'For that same '+R3+' Ω and '+L3+' mH series circuit at '+f3+' Hz, calculate the phase angle between the supply voltage '+
+        'and the current, in degrees.',
+   ans:ph3, unit:'°',
+   sol:'<span class="step">tan φ = X<sub>L</sub> / R = '+sig(XL3,3)+' / '+R3+' = '+sig(XL3/R3,3)+'</span>'+
+       '<span class="step">φ = '+sig(ph3,3)+'°</span>'+
+       'The supply voltage <strong>leads</strong> the current here, because the only reactance present is inductive. '+
+       'You could also get this from cos φ = R/Z.'},
+  {type:'num',
+   text:'An inductor of '+L4+' mH is placed in series with a capacitor of '+C4+' µF. Calculate the resonant frequency of the circuit.',
+   ans:f04, unit:'Hz',
+   sol:'<span class="step">At resonance X<sub>L</sub> = X<sub>C</sub>, so ωL = 1/ωC and ω₀ = 1/&radic;(LC)</span>'+
+       '<span class="step">LC = '+(L4/1000)+' × '+C4+'×10⁻⁶ = '+(L4/1000*C4*1e-6).toExponential(3)+'</span>'+
+       '<span class="step">f₀ = 1 / (2π&radic;(LC)) = '+sig(f04,3)+' Hz</span>'+
+       'The resistance never appears. R changes how sharp the peak is, not where it is.'},
+  {type:'mc',
+   text:'In a series RC circuit, how does the current relate in phase to the voltages?',
+   opts:['It leads the capacitor voltage by exactly 90°, and leads the supply voltage by somewhere between 0° and 90°.',
+         'It leads both the capacitor voltage and the supply voltage by exactly 90°.',
+         'It lags the capacitor voltage by exactly 90°.',
+         'It is in phase with the supply voltage, because the resistor sets the phase.'],
+   correct:0,
+   sol:'Across the <strong>capacitor alone</strong> the relationship is always exactly 90°, with the current ahead. '+
+       'But the supply has to drive the resistor too, and the resistor voltage is in phase with the current. '+
+       'The supply phasor is therefore the vector sum of one phasor in phase with I and one 90° behind it, '+
+       'which lands somewhere in between. tan φ = X<sub>C</sub>/R, so a big resistor pulls the angle towards 0° '+
+       'and a small one pushes it towards 90°.'},
+  {type:'mc',
+   text:'In a series LCR circuit the reactances are measured as X<sub>L</sub> = '+XLq+' Ω and X<sub>C</sub> = '+XCq+' Ω. '+
+        'What must be done to the supply frequency to bring the circuit to resonance?',
+   opts:['Decrease it.','Increase it.','Leave it, and decrease the resistance instead.','Nothing can be done without changing L or C.'],
+   correct:0,
+   sol:'Resonance needs X<sub>L</sub> = X<sub>C</sub>. At the moment X<sub>L</sub> is the larger of the two, so X<sub>L</sub> must come down and X<sub>C</sub> must come up. '+
+       'Since <strong>X<sub>L</sub> = ωL is directly proportional to frequency</strong> and <strong>X<sub>C</sub> = 1/ωC is inversely '+
+       'proportional to frequency</strong>, lowering the frequency does both at once. '+
+       'Resistance is irrelevant: it does not appear in f₀ = 1/(2π&radic;(LC)).'},
+  {type:'mc',
+   text:'At resonance, a voltmeter placed across the inductor alone reads a larger voltage than the supply voltage. Is this possible?',
+   opts:['Yes. V<sub>L</sub> and V<sub>C</sub> are equal and opposite, so they cancel in the sum while each stays large on its own.',
+         'No. Kirchhoff’s law forbids any component voltage exceeding the supply.',
+         'No, the meter must be faulty.',
+         'Yes, but only if the resistor is removed from the circuit.'],
+   correct:0,
+   sol:'At resonance X<sub>L</sub> = X<sub>C</sub>, so V<sub>L</sub> = IX<sub>L</sub> and V<sub>C</sub> = IX<sub>C</sub> are equal in size. They are 180° apart, so at every '+
+       'instant one is positive exactly as much as the other is negative and their sum is zero. '+
+       'Kirchhoff’s law is satisfied because it applies to the <strong>instantaneous</strong> voltages, not to the peaks. '+
+       'Each voltage on its own is V<sub>L</sub> = QV<sub>supply</sub> with Q = X<sub>L</sub>/R, which for a small R can be many times the supply. '+
+       'Set R small on the resonance tab and look at the numbers.'},
+  {type:'mc',
+   text:'A capacitor is placed in series with a lamp. Compared with a low frequency supply, a high frequency supply of the same r.m.s. voltage makes the lamp:',
+   opts:['brighter, because X<sub>C</sub> is smaller at high frequency',
+         'dimmer, because X<sub>C</sub> is larger at high frequency',
+         'equally bright, because reactance does not dissipate energy',
+         'brighter, because the capacitor stores more charge at high frequency'],
+   correct:0,
+   sol:'X<sub>C</sub> = 1/ωC, so a high frequency means a small reactance, a small impedance, a large current and a bright lamp. '+
+       'Physically: the supply reverses before much charge can build on the plates, so the capacitor never gets the chance '+
+       'to push back. Capacitors block low frequencies and pass high ones. Inductors do the opposite.'}
+  ];
+}
+var TAB6 = {
+  label:'Check yourself', n:'6',
+  mount:function(){
+    if(!T6.qs.length) this.regen(true);
+    var html='<div class="grid g-64"><div><div class="panel">'+
+      '<h2 class="sec">Check yourself</h2>'+
+      '<p class="lead">Exam style questions in the phrasing 91526 uses. Numerical answers are marked to within 3 per cent, '+
+      'so round sensibly rather than exactly. Every question has the full reasoning behind it.</p>'+
+      '<div class="btnrow" style="margin-bottom:14px"><button class="btn prime" onclick="TAB6.regen()">New numbers</button>'+
+      '<button class="btn" onclick="TAB6.revealAll()">Show all reasoning</button></div>';
+    T6.qs.forEach(function(q,i){
+      html+='<div class="q" id="q'+i+'"><div class="q-head"><span class="q-num">'+(i+1)+'</span></div>'+
+        '<div class="q-text">'+q.text+'</div>';
+      if(q.type==='num'){
+        html+='<div class="btnrow"><input class="numin" id="in'+i+'" placeholder="answer" '+
+              'onkeydown="if(event.key===\'Enter\')TAB6.checkNum('+i+')"> <span style="align-self:center;color:var(--muted)">'+q.unit+'</span>'+
+              '<button class="btn prime" onclick="TAB6.checkNum('+i+')">Check</button>'+
+              '<button class="btn" onclick="TAB6.reveal('+i+')">Show reasoning</button></div>'+
+              '<div id="fb'+i+'" style="margin-top:8px;font-size:12.5px;font-weight:600"></div>';
+      } else {
+        html+='<div>'+q.opts.map(function(o,j){
+          return '<button class="opt" id="o'+i+'_'+j+'" onclick="TAB6.pick('+i+','+j+')">'+o+'</button>'; }).join('')+'</div>';
+      }
+      html+='<div class="sol" id="sol'+i+'" style="display:none"><strong>Reasoning.</strong><br>'+q.sol+'</div></div>';
+    });
+    html+='</div></div><div class="stack">'+
+      '<div class="panel"><h3 class="sub3">Score</h3><div id="t6score" class="mono" style="font-size:22px;font-weight:700;color:var(--bright)">0 / '+T6.qs.length+'</div>'+
+      '<p class="note">Wrong answers are worth more than right ones here. If one surprises you, go back to the tab it came from and '+
+      'push the sliders until you can see why.</p></div>'+
+      '<div class="panel"><h3 class="sub3">The five sentences worth memorising</h3><ul class="bul">'+
+      '<li><strong>X<sub>L</sub> = ωL</strong> and <strong>X<sub>C</sub> = 1/ωC.</strong> Inductors block high frequencies, capacitors block low ones.</li>'+
+      '<li>In a capacitor the <strong>current leads</strong> the component voltage by 90°; in an inductor the current <strong>lags</strong> by 90°; in a resistor they are <strong>in phase</strong>.</li>'+
+      '<li><strong>Z = &radic;(R² + (X<sub>L</sub> − X<sub>C</sub>)²)</strong>, and <strong>tan φ = (X<sub>L</sub> − X<sub>C</sub>)/R</strong>. This is not on the formula sheet.</li>'+
+      '<li>Resonance is <strong>X<sub>L</sub> = X<sub>C</sub></strong>, giving <strong>f₀ = 1/(2π&radic;(LC))</strong>, Z = R, maximum current, and voltage in phase with current.</li>'+
+      '<li>Only the <strong>resistor</strong> dissipates energy. P = I<sub>rms</sub>²R = V<sub>rms</sub>I<sub>rms</sub>cosφ.</li>'+
+      '</ul></div></div></div>';
+    document.getElementById('view').innerHTML=html;
+    T6.st.forEach(function(st,i){ if(st) TAB6.restore(i); });
+    this.score();
+  },
+  regen:function(quiet){
+    T6.qs=genQuestions(); T6.st=T6.qs.map(function(){return null});
+    if(!quiet) this.mount();
+  },
+  checkNum:function(i){
+    var el=document.getElementById('in'+i), v=parseFloat(el.value.replace(/[^0-9eE+\-.]/g,''));
+    if(!isFinite(v)) return;
+    var ok=Math.abs(v-T6.qs[i].ans)/Math.abs(T6.qs[i].ans)<0.03;
+    T6.st[i]={ok:ok,val:el.value}; this.restore(i); this.reveal(i); this.score();
+  },
+  pick:function(i,j){ T6.st[i]={ok:(j===T6.qs[i].correct),pick:j}; this.restore(i); this.reveal(i); this.score(); },
+  restore:function(i){
+    var st=T6.st[i], q=T6.qs[i]; if(!st) return;
+    if(q.type==='num'){
+      var el=document.getElementById('in'+i); if(el&&st.val!==undefined) el.value=st.val;
+      var fb=document.getElementById('fb'+i);
+      if(fb) fb.innerHTML = st.ok ? '<span style="color:var(--ok)">Correct. '+sig(q.ans,3)+' '+q.unit+'</span>'
+                                  : '<span style="color:var(--bad)">Not yet. The answer is '+sig(q.ans,3)+' '+q.unit+'.</span>';
+    } else {
+      q.opts.forEach(function(o,j){
+        var b=document.getElementById('o'+i+'_'+j); if(!b) return;
+        b.className='opt'+(j===q.correct?' right':(j===st.pick?' wrong':''));
+      });
+    }
+    var s=document.getElementById('sol'+i); if(s) s.style.display='block';
+  },
+  reveal:function(i){ var s=document.getElementById('sol'+i); if(s) s.style.display='block'; },
+  revealAll:function(){ T6.qs.forEach(function(q,i){ TAB6.reveal(i); }); },
+  score:function(){
+    var n=T6.st.filter(function(s){return s&&s.ok}).length;
+    var el=document.getElementById('t6score'); if(el) el.textContent=n+' / '+T6.qs.length;
+  }
+};
+
+/* ==========================================================================
+   ROUTER
+   ========================================================================== */
+var TABS=[TAB1,TAB2,TAB3,TAB4,TAB5,TAB6];
+var cur=0;
+function go(i){
+  cur=i;
+  document.querySelectorAll('#nav .tab').forEach(function(b,j){ b.className='tab'+(j===i?' active':''); });
+  TABS[i].mount();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+(function init(){
+  var saved='dark';
+  try{ saved=localStorage.getItem('ac-theme')||'dark'; }catch(e){}
+  document.documentElement.setAttribute('data-theme',saved);
+  document.getElementById('themebtn').textContent = saved==='dark'?'Light mode':'Dark mode';
+  P=readPalette();
+  document.getElementById('nav').innerHTML = TABS.map(function(t,i){
+    return '<button class="tab'+(i===0?' active':'')+'" onclick="go('+i+')"><span class="n">'+t.n+'</span>'+t.label+'</button>';
+  }).join('');
+  go(0);
+  rafId=requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
