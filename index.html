@@ -487,14 +487,20 @@ function symCapacitor(cx,cy,q,sc){
   }
   return s;
 }
+/* v is the instantaneous supply voltage in the reference direction of the
+   current. Positive conventional current leaves the source by its + terminal,
+   and on the top rail of our loop it travels to the right, so + sits on the
+   right whenever v is positive.                                             */
 function symSource(cx,cy,v,sc){
   sc=sc||1; var r=25*sc,s='';
-  s+='<rect x="'+(cx-r-6)+'" y="'+(cy-r-6)+'" width="'+(2*r+12)+'" height="'+(2*r+12)+'" fill="'+P.bg+'"/>';
+  s+='<rect x="'+(cx-r-26)+'" y="'+(cy-r-6)+'" width="'+(2*r+52)+'" height="'+(2*r+12)+'" fill="'+P.bg+'"/>';
   s+=circ(cx,cy,r,'none','stroke="'+P.V+'" stroke-width="2.6"');
   var pts=[];
   for(var i=0;i<=24;i++){ var t=i/24; pts.push([cx-14*sc+28*sc*t, cy-9*sc*Math.sin(2*Math.PI*t)]); }
   s+=poly(pts,P.V,2.4);
-  s+=txt(cx-r-9,cy+6,(v>=0?'+':MINUS),{fill:P.V,size:17,w:700,anchor:'end',op:(0.25+0.75*Math.min(1,Math.abs(v))).toFixed(2)});
+  var op=(0.22+0.78*Math.min(1,Math.abs(v))).toFixed(2);
+  s+=txt(cx+r+10,cy+6,(v>=0?'+':MINUS),{fill:P.V,size:18,w:700,anchor:'start',op:op});
+  s+=txt(cx-r-10,cy+6,(v>=0?MINUS:'+'),{fill:P.V,size:18,w:700,anchor:'end',op:op});
   return s;
 }
 
@@ -805,16 +811,26 @@ var TAB1 = {
 /* ==========================================================================
    TAB 2  |  one component at a time
    ========================================================================== */
-function electron(x,y,r){
+/* These animations are drawn in terms of CONVENTIONAL current, so the mobile
+   charge shown is positive and travels the way the current arrow points. That
+   keeps the capacitor plates charging with the polarity the arrow implies.
+   Real metals of course carry electrons the other way; the note under each
+   picture says so.                                                           */
+function carrier(x,y,r){
   return circ(x.toFixed(1),y.toFixed(1),r,P.I,'opacity="0.95"')+
-    line(x-r*0.45,y,x+r*0.45,y,P.bg,2.2);
+    line(x-r*0.45,y,x+r*0.45,y,P.bg,2.2)+line(x,y-r*0.45,x,y+r*0.45,P.bg,2.2);
 }
-function ion(x,y,r,op){
+/* a fixed site in the lattice: deliberately unsigned, so nothing contradicts
+   the positive carriers drifting past it                                     */
+function latticeSite(x,y,r,op){
   return circ(x,y,r,'none','stroke="'+P.R+'" stroke-width="1.8" opacity="'+op+'"')+
-    line(x-r*0.45,y,x+r*0.45,y,P.R,1.8,null,op)+line(x,y-r*0.45,x,y+r*0.45,P.R,1.8,null,op);
+    circ(x,y,r*0.26,P.R,'opacity="'+op+'"');
 }
 function plusMark(x,y,r,col,op){
-  return line(x-r,y,x+r,y,col,2.6,null,op)+line(x,y-r,x,y+r,col,2.6,null,op);
+  return line(x-r,y,x+r,y,col,2.8,null,op)+line(x,y-r,x,y+r,col,2.8,null,op);
+}
+function minusMark(x,y,r,col,op){
+  return line(x-r,y,x+r,y,col,2.8,null,op);
 }
 var T2 = { comp:'C' };
 var COMPINFO = {
@@ -869,7 +885,11 @@ var TAB2 = {
       '<div class="grid g-73" style="margin-bottom:16px">'+
         '<div class="panel"><h2 class="sec">What is physically happening</h2>'+
         '<div class="svgbox" id="t2b"></div>'+
-        '<p class="note" id="t2narr" style="min-height:48px;font-size:14.5px"></p></div>'+
+        '<p class="note" id="t2narr" style="min-height:48px;font-size:14.5px"></p>'+
+        '<p class="note" style="border-top:1px solid var(--border);padding-top:9px">The moving circles are drawn as '+
+        '<strong>positive charge</strong>, so they travel the way the conventional current arrow points and the plates '+
+        'charge with the polarity that arrow implies. In a real metal wire it is the electrons that move, the opposite '+
+        'way; every equation on this page is unaffected by which convention you picture.</p></div>'+
         '<div class="stack">'+
           '<div class="panel"><h3 class="sub3">Controls</h3>'+
             slider('V','Supply voltage (r.m.s.)')+slider('f','Frequency f')+
@@ -951,13 +971,13 @@ var TAB2 = {
 
     if(c==='R'){
       s+=arrow(380-i*120,50,380+i*120,50,P.V,4.5,17);
-      s+=txt(380,26,'the applied field pushes this way',{size:14,anchor:'middle',fill:P.V,w:600});
+      s+=txt(380,26,'the applied field pushes the positive carriers this way',{size:14,anchor:'middle',fill:P.V,w:600});
       s+='<rect x="40" y="88" width="680" height="184" rx="14" fill="'+P.R+'" opacity="'+(0.05+0.20*i*i).toFixed(3)+'"/>';
       s+='<rect x="40" y="88" width="680" height="184" rx="14" fill="none" stroke="'+P.R+'" stroke-width="2.4"/>';
-      for(var rr=0;rr<3;rr++) for(var cc=0;cc<12;cc++) s+=ion(80+cc*56, 128+rr*52, 14, 0.42);
+      for(var rr=0;rr<3;rr++) for(var cc=0;cc<12;cc++) s+=latticeSite(80+cc*56, 128+rr*52, 14, 0.42);
       for(var k=0;k<24;k++){
         var bx=58+((k*28.5 + drift*66)%664+664)%664;
-        s+=electron(bx, 106+((k*47)%3)*52, 12);
+        s+=carrier(bx, 106+((k*47)%3)*52, 12);
       }
       var hot=(0.10+0.90*i*i);
       for(var w2=0;w2<6;w2++){
@@ -978,18 +998,16 @@ var TAB2 = {
       s+=line(pl,ytop,pl,ybot,P.C,8)+line(pr,ytop,pr,ybot,P.C,8);
       for(var k2=0;k2<9;k2++){
         var off=((k2*32 + drift*60)%286+286)%286;
-        s+=electron(42+off,ymid,12);
-        s+=electron(pr+8+off,ymid,12);
+        s+=carrier(42+off,ymid,12);
+        s+=carrier(pr+8+off,ymid,12);
       }
       /* what has piled up, on the inner faces, fading in slot by slot */
       var a=Math.abs(q);
       for(var j=0;j<7;j++){
         var op=Math.max(0,Math.min(1,7*a-j)), yy=ytop+16+j*(ybot-ytop-32)/6;
         if(op<=0.01) continue;
-        if(q>0){ s+='<g opacity="'+op.toFixed(2)+'">'+plusMark(pl+24,yy,8,P.C,1)+'</g>';
-                 s+='<g opacity="'+op.toFixed(2)+'">'+electron(pr-24,yy,11)+'</g>'; }
-        else   { s+='<g opacity="'+op.toFixed(2)+'">'+electron(pl+24,yy,11)+'</g>';
-                 s+='<g opacity="'+op.toFixed(2)+'">'+plusMark(pr-24,yy,8,P.C,1)+'</g>'; }
+        if(q>0){ s+=plusMark(pl+24,yy,9,P.C,op)+minusMark(pr-24,yy,9,P.C,op); }
+        else   { s+=minusMark(pl+24,yy,9,P.C,op)+plusMark(pr-24,yy,9,P.C,op); }
       }
       if(Math.abs(i)>0.05) s+=arrow(170-Math.sign(i)*46,50,170+Math.sign(i)*46,50,P.I,4.5,16);
       s+=txt(170,26,'conventional current',{size:13.5,anchor:'middle',fill:P.I,w:600});
@@ -1012,8 +1030,8 @@ var TAB2 = {
       s+='<path d="'+d2+'" fill="none" stroke="'+P.L+'" stroke-width="5.5" stroke-linecap="round"/>';
       for(var k4=0;k4<7;k4++){
         var of2=((k4*33 + drift*58)%222+222)%222;
-        s+=electron(44+of2,ycl,12);
-        s+=electron(cxL+wcoil/2+8+of2,ycl,12);
+        s+=carrier(44+of2,ycl,12);
+        s+=carrier(cxL+wcoil/2+8+of2,ycl,12);
       }
       s+=txt(cxL,40,'magnetic field, strongest when the current is strongest',{size:14,anchor:'middle',fill:P.L,w:600});
       var dI=Math.cos(th);
@@ -1140,7 +1158,7 @@ var TAB3 = {
     s+=symSource((x0+x1)/2,yT,Math.sin(th+m.phi));
     s+=symResistor(x0+230,yB,Math.pow(Math.sin(th),2));
     s+=symInductor((x0+x1)/2,yB,Math.abs(Math.sin(th)));
-    s+=symCapacitor(x1-230,yB,-Math.cos(th));
+    s+=symCapacitor(x1-230,yB,Math.cos(th));   /* bottom rail: current runs right to left */
     s+=txt(x0+230,yB+48,'R = '+eng(S.R,'Ω'),{size:13.5,anchor:'middle',fill:P.R,w:700});
     s+=txt((x0+x1)/2,yB+48,'L = '+eng(S.L,'H'),{size:13.5,anchor:'middle',fill:P.L,w:700});
     s+=txt(x1-230,yB+48,'C = '+eng(S.C,'F'),{size:13.5,anchor:'middle',fill:P.C,w:700});
@@ -1365,7 +1383,7 @@ var TAB4 = {
         s+=txt(cx,yB+50,'L = '+eng(S.L,'H'),{size:14,anchor:'middle',fill:P.L,w:700});
         s+=txt(cx,yB+70,subs('X','L',' = '+eng(m.XL,'Ω')+',  Vᵣₘₛ = '+eng(m.VL,'V')),
                {size:12.5,anchor:'middle',fill:P.muted,raw:true}); }
-      if(p.k==='C'){ s+=symCapacitor(cx,yB,-Math.cos(th));
+      if(p.k==='C'){ s+=symCapacitor(cx,yB,Math.cos(th));   /* bottom rail: current runs right to left */
         s+=txt(cx,yB-56,instLab(m.VCpk,-m.VCpk*Math.cos(th),'V'),{size:13,anchor:'middle',fill:P.C,mono:true,w:600});
         s+=txt(cx,yB+50,'C = '+eng(S.C,'F'),{size:14,anchor:'middle',fill:P.C,w:700});
         s+=txt(cx,yB+70,subs('X','C',' = '+eng(m.XC,'Ω')+',  Vᵣₘₛ = '+eng(m.VC,'V')),
