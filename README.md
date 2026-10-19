@@ -3,7 +3,7 @@
 An interactive learning resource and simulation for **NCEA Level 3 Physics, AS91526 (Electrical Systems)**,
 covering the alternating current half of the standard.
 
-**Live:** https://diocesanschoolforgirls.github.io/ac-simulation/ (also mirrored at https://vcanela.github.io/ac-simulation/)
+**Live:** https://interactives.diocesan.school.nz/ac-simulation/ (also mirrored at https://vcanela.github.io/ac-simulation/)
 
 `index.html` plus a vendored copy of KaTeX. No build step, no installation, no network needed at run time.
 Copy the folder to a USB stick or a school share and it works exactly as it does on the web.
